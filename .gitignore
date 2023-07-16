@@ -1,6 +1,9 @@
 # Prerequisites
 *.d
-
+# UE5 Intermediate
+Intermediate/
+# UE5 Binaries
+Binaries/
 # Compiled Object files
 *.slo
 *.lo
