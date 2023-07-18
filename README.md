@@ -6,7 +6,7 @@ IT IS NOT ready for shippable projects by any means, but support will be given t
 
 # Unreal Versions
 
-Currently, the plugin is being developed on 5.2, but i plan on backporting to UE 4.27 for wider use.
+Currently, the plugin is being developed on 5.2, but there are plans to back port to UE 4.27 for wider use.
 
 # Documentation
 
@@ -26,9 +26,9 @@ Console Platforms can work with minimal to no changes with the plugin, but it ma
 
 # License
 
-Ultralight ***IS NOT*** Licensed under MIT, it has its own licensing terms, that users will have to abide by when using the library and/or plugin.
+Ultralight ***IS NOT*** Licensed under MIT, it has its own licensing terms that users will have to abide by when using the library and/or plugin.
 
-For more information, please read this: (https://github.com/JailbreakPapa/UltralightUE/blob/main/Source/ThirdParty/UltralightUELibrary/license/LICENSE.txt)
+For more information, please read pricing information: (https://ultralig.ht/#pricing)
 
 UltralightUE is Licensed under the very-permissive MIT License.
 
