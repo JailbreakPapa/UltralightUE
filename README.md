@@ -26,6 +26,10 @@ Console Platforms can work with minimal to no changes with the plugin, but it ma
 
 # License
 
+Ultralight ***IS NOT*** Licensed under MIT, it has its own licensing terms, that users will have to abide by when using the library and/or plugin.
+
+For more information, please read this: (https://github.com/JailbreakPapa/UltralightUE/blob/main/Source/ThirdParty/UltralightUELibrary/license/LICENSE.txt)
+
 UltralightUE is Licensed under the very-permissive MIT License.
 
 ```
