@@ -4,6 +4,7 @@ Ultralight UI Support for Unreal Engine 5.2+.
 This Project plans to be a framework for supporting Ultralight UI in Unreal Engine. 
 IT IS NOT ready for shippable projects by any means, but support will be given to help with using the library. 
 
+Currently, the project will be in full-swing once 1.3.0 stable is offically released by Ultralight Inc.
 # Unreal Versions
 
 Currently, the plugin is being developed on 5.2, but there are plans to back port to UE 4.27 for wider use.
