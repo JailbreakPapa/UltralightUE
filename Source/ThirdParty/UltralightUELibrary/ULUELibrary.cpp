@@ -20,20 +20,13 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#include "UltralightUELibrary/ULUELibrary.h"
 
-#pragma once
-
-#include "Modules/ModuleManager.h"
-
-class FUltralightUEModule : public IModuleInterface
+ULTRALIGHTUE_EXPORT void UltralightUEStartup()
 {
-public:
-
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-
-private:
-	/** Handle to the test dll we will load */
-	void*	ExampleLibraryHandle;
-};
+#if defined _WIN32 || defined _WIN64
+	MessageBox(NULL, TEXT("Loaded Ultralight Dll(s) from Pre-built binaries."), TEXT("UltralightUE"), MB_OK);
+#else
+	printf("Loaded Ultralight Dll(s) from Pre-built binaries.");
+#endif
+}

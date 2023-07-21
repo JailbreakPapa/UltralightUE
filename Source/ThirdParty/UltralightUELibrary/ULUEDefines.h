@@ -21,19 +21,22 @@
  *   SOFTWARE.
  */
 
-#pragma once
+#if defined _WIN32 || defined _WIN64
+#define ULTRALIGHTUE_IMPORT __declspec(dllimport)
+#elif defined __linux__
+#define ULTRALIGHTUE_IMPORT __attribute__((visibility("default")))
+#else
+#define ULTRALIGHTUE_IMPORT
+#endif
 
-#include "Modules/ModuleManager.h"
+#if defined _WIN32 || defined _WIN64
+#include <Windows.h>
 
-class FUltralightUEModule : public IModuleInterface
-{
-public:
+#define ULTRALIGHTUE_EXPORT __declspec(dllexport)
+#else
+#include <stdio.h>
+#endif
 
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-
-private:
-	/** Handle to the test dll we will load */
-	void*	ExampleLibraryHandle;
-};
+#ifndef ULTRALIGHTUE_EXPORT
+#define ULTRALIGHTUE_EXPORT
+#endif
