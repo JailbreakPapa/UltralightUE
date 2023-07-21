@@ -8,10 +8,10 @@
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- 
+
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
- 
+
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,10 +20,17 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-#pragma once 
-#include "UltralightUELibrary/ULUEDefines.h"
+#pragma once
+#include "ULUEDefines.h"
 
 namespace ultralightue
 {
-    ULTRALIGHTUE_IMPORT void UltralightUEStartup();
+	ULTRALIGHTUE_EXPORT void UltralightUEStartup()
+	{
+#if defined _WIN32 || defined _WIN64
+		MessageBox(NULL, TEXT("Loaded Ultralight Dll(s) from Pre-built binaries."), TEXT("UltralightUE"), MB_OK);
+#else
+		printf("Loaded Ultralight Dll(s) from Pre-built binaries.");
+#endif
+	}
 }

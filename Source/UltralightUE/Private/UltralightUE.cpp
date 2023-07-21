@@ -38,10 +38,10 @@ void FUltralightUEModule::StartupModule()
 
 	// Add on the relative location of the ultralight dll(s) and load them.
 #if PLATFORM_WINDOWS
-	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/AppCore.dll"));
-	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/WebCore.dll"));
-	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/UltralightCore.dll"));
-	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/Ultralight.dll"));
+	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/AppCore.dll"));
+	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/WebCore.dll"));
+	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/UltralightCore.dll"));
+	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/Ultralight.dll"));
 #elif PLATFORM_MAC
 	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libAppCore.dylib"));
 	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralight.dylib"));
@@ -83,10 +83,14 @@ void FUltralightUEModule::ShutdownModule()
 
 bool FUltralightUEModule::LoadUltralightResources(FPakFile& p_resourcepak)
 {
+	/// Looks like we were able to get all needed resources.
+	return true;
 }
 
 bool FUltralightUEModule::LoadUltralightResources(FString& path)
 {
+	/// Looks like we were able to get all needed resources.
+	return true;
 }
 
 void FUltralightUEModule::DestroyUltralightHandles()
