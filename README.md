@@ -5,6 +5,7 @@ This Project plans to be a framework for supporting Ultralight UI in Unreal Engi
 IT IS NOT ready for shippable projects by any means, but support will be given to help with using the library. 
 
 ~~Currently, the project will be in full-swing once 1.3.0 stable is offically released by Ultralight Inc.~~
+
 Current Supported Ultralight Version: 1.3.0 - development
 # Unreal Versions
 
