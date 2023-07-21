@@ -8,10 +8,10 @@
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- 
+
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
- 
+
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,7 +25,6 @@
 #include "Core.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
-#include "UltralightUELibrary/include/Ultralight/Renderer.h"
 #include "UltralightUELibrary/ULUELibrary.h"
 
 #define LOCTEXT_NAMESPACE "FUltralightUEModule"
@@ -37,35 +36,39 @@ void FUltralightUEModule::StartupModule()
 	// Get the base directory of this plugin
 	FString BaseDir = IPluginManager::Get().FindPlugin("UltralightUE")->GetBaseDir();
 
-	// Add on the relative location of the third party dll and load it
-	FString LibraryPath;
+	// Add on the relative location of the ultralight dll(s) and load them.
 #if PLATFORM_WINDOWS
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/AppCore.dll"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/WebCore.dll"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/UltralightCore.dll"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/Ultralight.dll"));
+	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/AppCore.dll"));
+	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/WebCore.dll"));
+	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/UltralightCore.dll"));
+	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUE/Win64/Ultralight.dll"));
 #elif PLATFORM_MAC
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libAppCore.dylib"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralight.dylib"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralightCore.dylib"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libWebCore.dylib"));
+	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libAppCore.dylib"));
+	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralight.dylib"));
+	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralightCore.dylib"));
+	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libWebCore.dylib"));
 #elif PLATFORM_LINUX
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libWebCore.so"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libUltralightCore.so"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libUltralight.so"));
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libAppCore.so"));
+	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libWebCore.so"));
+	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libUltralightCore.so"));
+	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libUltralight.so"));
+	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libAppCore.so"));
 #endif // PLATFORM_WINDOWS
+	/// Assign handles to Library(s) path(s).
 
-	ExampleLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
+	AppCoreHandle = !AppCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*AppCoreLibraryPath) : nullptr;
+	WebCoreHandle = !WebCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*WebCoreLibraryPath) : nullptr;
+	UltralightCoreHandle = !UltralightCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*UltralightCoreLibraryPath) : nullptr;
+	UltralightHandle = !UltralightLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*UltralightLibraryPath) : nullptr;
 
-	if (ExampleLibraryHandle)
+	if (AppCoreHandle && WebCoreHandle && UltralightCoreHandle && UltralightHandle != nullptr)
 	{
-		// Call the test function in the third party library that opens a message box, notifying the user that the library has opened.
+		// Call the function in the Ultralight library that opens a message box, notifying the user that the library has opened.
 		ultralightue::UltralightUEStartup();
+		// TODO: Startup Ultralight engine.
 	}
 	else
 	{
-		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("UltralightUE: Error", "Failed to load UltralightUE! Please check the log for any messages. if you cant fix the issue, create a issue on github!"));
+		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("UltralightUE: Error", "Failed to load UltralightUE! Please check the log for any messages. if you cant fix the issue, create a issue on github! (https://github.com/JailbreakPapa/UltralightUE)"));
 	}
 }
 
@@ -74,9 +77,28 @@ void FUltralightUEModule::ShutdownModule()
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
 
-	// Free the dll handle
-	FPlatformProcess::FreeDllHandle(ExampleLibraryHandle);
-	ExampleLibraryHandle = nullptr;
+	// Free the dll handles to ultralight dll(s).
+	DestroyUltralightHandles();
+}
+
+bool FUltralightUEModule::LoadUltralightResources(FPakFile& p_resourcepak)
+{
+}
+
+bool FUltralightUEModule::LoadUltralightResources(FString& path)
+{
+}
+
+void FUltralightUEModule::DestroyUltralightHandles()
+{
+	FPlatformProcess::FreeDllHandle(UltralightHandle);
+	FPlatformProcess::FreeDllHandle(UltralightCoreHandle);
+	FPlatformProcess::FreeDllHandle(WebCoreHandle);
+	FPlatformProcess::FreeDllHandle(AppCoreHandle);
+	UltralightHandle = nullptr;
+	UltralightCoreHandle = nullptr;
+	WebCoreHandle = nullptr;
+	AppCoreHandle = nullptr;
 }
 
 #undef LOCTEXT_NAMESPACE
