@@ -20,20 +20,10 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#pragma once 
+#include "UltralightUELibrary/ULUEDefines.h"
 
-#pragma once
-
-#include "Modules/ModuleManager.h"
-
-class FUltralightUEModule : public IModuleInterface
+namespace ultralightue
 {
-public:
-
-	/** IModuleInterface implementation */
-	virtual void StartupModule() override;
-	virtual void ShutdownModule() override;
-
-private:
-	/** Handle to the test dll we will load */
-	void*	ExampleLibraryHandle;
-};
+    ULTRALIGHTUE_IMPORT void UltralightUEStartup();
+}
