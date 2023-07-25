@@ -8,10 +8,10 @@
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- 
+
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
- 
+
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,13 +20,23 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-#include "UltralightUELibrary/ULUELibrary.h"
+#include "UltralightUE/Public/ULUELogInterface.h"
 
-ULTRALIGHTUE_EXPORT void UltralightUEStartup()
+ /// Include FString, due to forward declaration.
+#include "Containers/UnrealString.h"
+#include "Logging/LogMacros.h"
+
+void ultralightue::ULUELogInterface::LogError(FString& details)
 {
-#if defined _WIN32 || defined _WIN64
-	MessageBox(NULL, TEXT("Loaded Ultralight Dll(s) from Pre-built binaries."), TEXT("UltralightUE"), MB_OK);
-#else
-	printf("Loaded Ultralight Dll(s) from Pre-built binaries.");
-#endif
+	UE_LOG(LogTemp, Error, TEXT("UltralightUE Error: %s"), *details);
+}
+
+void ultralightue::ULUELogInterface::LogWarning(FString& details)
+{
+	UE_LOG(LogTemp, Warning, TEXT("UltralightUE Warning: %s"), *details);
+}
+
+void ultralightue::ULUELogInterface::LogInfo(FString& details)
+{
+	UE_LOG(LogTemp, Log, TEXT("UltralightUE: %s"), *details);
 }

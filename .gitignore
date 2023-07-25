@@ -32,6 +32,7 @@ Binaries/
 # VS-Code Rubbish
 .vscode/
 .vscode\
+
 # Executables
 *.exe
 *.out
