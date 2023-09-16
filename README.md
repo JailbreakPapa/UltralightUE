@@ -13,7 +13,7 @@ Currently, the plugin is being developed on 5.2, but there are plans to back por
 
 # Documentation
 
-Documentation is currently being worked on, and will be linked at: (https://jailbreakpapa.github.io/UltralightUE.github.io/). 
+Documentation is currently being worked on, but will be contained within the repo's Wiki.
 
 # Supported Platforms
 
@@ -24,11 +24,13 @@ For Console Platforms, Playstation 4 and 5 are currently now Supported!
 Please contact: contact@watchdogsllc.org for access to the plugin code for these platforms.
 ## Console Platforms
 
-Console Platforms can work with minimal to no changes with the plugin, but it may require you to contact Ultralight Inc. to access those SDK's. 
+Console Platforms can work with minimal to no changes with the plugin, but it WILL require you to contact Ultralight Inc. to access those SDK's. 
+
+I do contain private repo's containing NDA Platform support. contact: contact@watchdogsllc.org for access. (**Will require you to already have asked Ultralight Inc. for base access to the Platform Binaries!**)
 
 ***Due to being an open-source project, This plugin WILL NOT give binary downloads of any kind for Console Platforms, or assist in anyway for console platforms.***
 
-***Support for these platforms should be redirected to Ultralight Inc. any PLUGIN issues should be redirected here.***
+***Support for these platforms In-terms of requesting access should be redirected to Ultralight Inc. any PLUGIN issues should be redirected here.***
 
 # License
 
