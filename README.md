@@ -19,6 +19,9 @@ Documentation is currently being worked on, and will be linked at: (https://jail
 
 Currently Supported Platforms with the plugin are: Windows, Linux, and Mac. 
 
+For Console Platforms, Playstation 4 and 5 are currently now Supported! 
+
+Please contact: contact@watchdogsllc.org for access to the plugin code for these platforms.
 ## Console Platforms
 
 Console Platforms can work with minimal to no changes with the plugin, but it may require you to contact Ultralight Inc. to access those SDK's. 
