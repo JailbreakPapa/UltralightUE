@@ -1,15 +1,12 @@
 # UltralightUE
-Ultralight UI Support for Unreal Engine 5.2+.
+Ultralight UI Support for Unreal Engine 4.27.2 +.
 
 This Project plans to be a framework for supporting Ultralight UI in Unreal Engine. 
-IT IS NOT ready for shippable projects by any means, but support will be given to help with using the library. 
-
-~~Currently, the project will be in full-swing once 1.3.0 stable is offically released by Ultralight Inc.~~
 
 Current Supported Ultralight Version: 1.3.0 - stable
 # Unreal Versions
 
-Currently, the plugin is being developed on 5.2, but there are plans to back port to UE 4.27 for wider use.
+Currently, the plugin is being developed on 5.3, but there are plans to back port to UE 4.27 for wider use.
 
 # Documentation
 
@@ -17,16 +14,21 @@ Documentation is currently being worked on, but will be contained within the rep
 
 # Supported Platforms
 
-Currently Supported Platforms with the plugin are: Windows, Linux, and Mac. 
+Currently Supported Platforms with the plugin are: Windows. 
 
-For Console Platforms, Playstation 4 and 5 are currently now Supported! 
+*Please Note*: Any platform, NDA, or not, can be added with the plugin with little, to no changes. 
 
-Please contact: contact@watchdogsllc.org for access to the plugin code for these platforms.
+If you do prefer to get access for the NDA Platforms, instead of modifying it your self, feel free to contact us. 
+
+contact: contact@watchdogsllc.org for access. (**Will require you to already have asked Ultralight Inc. for base access to the Platform Binaries!**)
+
+You *Will* have to be a "partner" of the requested platform (If it is a Console/NDA Platform)
+
+
+
 ## Console Platforms
 
-Console Platforms can work with minimal to no changes with the plugin, but it WILL require you to contact Ultralight Inc. to access those SDK's. 
-
-I do contain private repo's containing NDA Platform support. contact: contact@watchdogsllc.org for access. (**Will require you to already have asked Ultralight Inc. for base access to the Platform Binaries!**)
+For Console Platforms, Playstation 4 and 5 are currently now Supported! 
 
 ***Due to being an open-source project, This plugin WILL NOT give binary downloads of any kind for Console Platforms, or assist in anyway for console platforms.***
 
