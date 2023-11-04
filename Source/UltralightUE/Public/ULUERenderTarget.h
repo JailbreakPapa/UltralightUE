@@ -8,10 +8,10 @@
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- 
+
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
- 
+
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -26,6 +26,26 @@
 #include "CanvasTypes.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "ULUERenderTarget.generated.h"
+namespace ultralightue
+{
+    UCLASS()
+    class ULTRALIGHTUE_EXPORT ULUERenderTarget : public UObject
+    {
+        GENERATED_BODY();
 
-UCLASS()
-class 
+    public:
+        UPROEPRTY(transient, EditAnywhere, BlueprintReadWrite, Category = "ULUERenderTargets")
+        UTextureRenderTarget2D *m_renderTarget;
+
+        FCanvas *m_canvas;
+
+        void BeginPaint(float InRealTime, float InWorldTime, float InWorldDeltaTime, ERHIFeatureLevel::Type FeatureLevel);
+        void EndPaint();
+        void Destroy();
+
+        static ULUERenderTarget *CreateTransient(uint32 InSizeX, uint32 InSizeY, EPixelFormat InFormat, const FColor &InClearColor);
+
+    private:
+    protected:
+    }
+}
