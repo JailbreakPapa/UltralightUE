@@ -3,7 +3,10 @@ Ultralight UI Support for Unreal Engine 4.27.2 +.
 
 This Project plans to be a framework for supporting Ultralight UI in Unreal Engine. 
 
+**Ultralight Inc. is in no way assosiated with this project in a professional matter. support should be directed towards WD Studios L.L.C. (https://wdstudios.tech)**
+
 Current Supported Ultralight Version: 1.3.0 - stable
+
 # Unreal Versions
 
 Currently, the plugin is being developed on 5.3, but there are plans to back port to UE 4.27 for wider use.
@@ -20,7 +23,7 @@ Currently Supported Platforms with the plugin are: Windows.
 
 If you do prefer to get access for the NDA Platforms, instead of modifying it your self, feel free to contact us. 
 
-contact: mikaelamanfo@watchdogsllc.org for access. (**Will require you to already have asked Ultralight Inc. for base access to the Platform Binaries!**)
+contact: contact@wdstudios.tech for access. (**Will require you to already have asked Ultralight Inc. for base access to the Platform Binaries!**)
 
 You *Will* have to be a "partner" of the requested platform (If it is a Console/NDA Platform)
 
