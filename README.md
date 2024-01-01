@@ -5,6 +5,8 @@ This Project plans to be a framework for supporting Ultralight UI in Unreal Engi
 
 **Ultralight Inc. is in no way assosiated with this project in a professional matter. support should be directed towards WD Studios L.L.C. (https://wdstudios.tech)**
 
+**This Project includes Ultralight Binaries & Includes. BY USING THIS LIBRARY, YOU ACCEPT Ultralight's EULA.**
+
 Current Supported Ultralight Version: 1.3.0 - stable
 
 # Unreal Versions
