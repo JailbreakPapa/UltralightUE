@@ -37,3 +37,9 @@ Binaries/
 *.exe
 *.out
 *.app
+
+# Ignore Third-Party Binaries, this allows us and other users to know where to update Ultralight.
+
+!Source/ThirdParty/UltralightUELibrary/Linux/**
+!Source/ThirdParty/UltralightUELibrary/Win64/**
+!Source/ThirdParty/UltralightUELibrary/Mac/**

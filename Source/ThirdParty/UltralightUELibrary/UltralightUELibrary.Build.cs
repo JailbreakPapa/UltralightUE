@@ -20,13 +20,14 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+ 
 using System.Collections.Generic;
 using System.IO;
 using UnrealBuildTool;
 
 public class UltralightUELibrary : ModuleRules
 {
-    /// NOTE: If you do have access, feel free to add console/NDA based platforms here as well.
+    /// NOTE: If you do have access, feel free to add console/NDA based platforms here as well. you can also contact: contact@wdstudios.tech for access as well.
     // Credit for these two functions, that were added by a very nice UEForms user: https://forums.unrealengine.com/t/how-to-modify-build-file-to-copy-dlls-to-binaries/353587
 
     public string GetUProjectPath()
