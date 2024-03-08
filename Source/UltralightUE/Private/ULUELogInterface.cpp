@@ -22,21 +22,20 @@
  */
 #include "UltralightUE/Public/ULUELogInterface.h"
 
- /// Include FString, due to forward declaration.
 #include "Containers/UnrealString.h"
 #include "Logging/LogMacros.h"
 
-void ultralightue::ULUELogInterface::LogError(FString& details)
+void ultralightue::ULUELogInterface::LogError(FString details)
 {
 	UE_LOG(LogTemp, Error, TEXT("UltralightUE Error: %s"), *details);
 }
 
-void ultralightue::ULUELogInterface::LogWarning(FString& details)
+void ultralightue::ULUELogInterface::LogWarning(FString details)
 {
 	UE_LOG(LogTemp, Warning, TEXT("UltralightUE Warning: %s"), *details);
 }
 
-void ultralightue::ULUELogInterface::LogInfo(FString& details)
+void ultralightue::ULUELogInterface::LogInfo(FString details)
 {
 	UE_LOG(LogTemp, Log, TEXT("UltralightUE: %s"), *details);
 }

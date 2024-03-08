@@ -26,6 +26,9 @@
 #include "Modules/ModuleManager.h"
 
 class FPakFile;
+namespace ultralightue {
+	class ULUELogInterface;
+}
 
 class FUltralightUEModule : public IModuleInterface
 {
@@ -45,8 +48,13 @@ public:
 	/// @param Path The path that the plugin will look for resource files. this CAN be empty, the plugin will assume the resources will be in: ({GAMEPATH}\\resources).
 	bool LoadUltralightResources(FString& path);
 
-	/// @brief App Core Library Path.
-	FString AppCoreLibraryPath;
+	/// @brief Sets & Uses the Logging interface to integrate with Ultralight.
+	/// @param in_logginginterface Interface to be used.
+	void SetLoggingInterface(ultralightue::ULUELogInterface& in_logginginterface);
+
+	/// @brief Get the log interface.
+	/// @return 
+	ultralightue::ULUELogInterface* GetLogInterface() const;
 	/// @brief Web Core Library Path.
 	FString WebCoreLibraryPath;
 	/// @brief Ultralight Core Library Path.
@@ -58,6 +66,7 @@ private:
 	/// @brief Destroys the Ultralight DLL handles. This should ONLY be called at shutdown.
 	void DestroyUltralightHandles();
 
+	ultralightue::ULUELogInterface* m_loginterface = nullptr;
 	/// Handles to Ultralight DLL(s).
 
 	/// @brief Ultralight Core DLL Handle.
@@ -68,7 +77,4 @@ private:
 
 	/// @brief WebCore DLL Handle.
 	void* WebCoreHandle;
-
-	/// @brief AppCore DLL Handle.
-	void* AppCoreHandle;
 };

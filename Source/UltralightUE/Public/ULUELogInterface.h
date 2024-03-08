@@ -35,15 +35,15 @@ namespace ultralightue
         
             /// @brief Logs a error within the developer defined interface.
             /// @param details What the error message will contain.
-            virtual void LogError(FString& details);
+            virtual void LogError(FString details);
 
             /// @brief Logs a warning within the developer defined interface.
             /// @param details What the warning message will contain.
-            virtual void LogWarning(FString& details);
+            virtual void LogWarning(FString details);
 
             /// @brief Logs a info within the developer defined interface.
             /// @param details What the info message will contain.            
-            virtual void LogInfo(FString& details);
+            virtual void LogInfo(FString details);
 
         protected:
         private:

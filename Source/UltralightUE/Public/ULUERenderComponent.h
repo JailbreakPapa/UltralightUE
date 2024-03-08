@@ -24,7 +24,6 @@
 #pragma once
 
 #include "UltralightUE.h"
-#include "ULUERenderComponent.generated.h"
 
 /// @brief Forward Declaration of ULUE Page view, this is the base component that this class will be rendering.
 class ULUEUIPageView;
@@ -36,7 +35,6 @@ namespace ultralightue
     UCLASS(meta = (BlueprintSpawnableComponent))
     class ULTRALIGHTUE_EXPORT ULUERenderComponent : public UActorComponent
     {
-        GENERATED_BODY()
     public:
         UPROPERTY(EditAnywhere, Category = "UIPageView")
         ULUEUIPageSettings DefaultSettings;
