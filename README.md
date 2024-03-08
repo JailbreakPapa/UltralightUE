@@ -71,6 +71,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 Ultralight (C), "Ultralight UI" are trademarks of Ultralight Inc. All Rights Reserved.
-UltralightUE are trademarks of Mikael Aboagye. All Rights Reserved.
-
 ```

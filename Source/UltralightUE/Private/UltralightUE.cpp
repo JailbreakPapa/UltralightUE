@@ -20,15 +20,14 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-
-#include <ULUELogInterface.h>
 #include "UltralightUE.h"
+#include <ULUELogInterface.h>
 #include "Core.h"
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include <ThirdParty/UltralightUELibrary/ULUELibrary.h>
-#include "PakFile/Public/IPlatformFilePak.h"
+
 
 
 #define LOCTEXT_NAMESPACE "FUltralightUEModule"
@@ -62,7 +61,7 @@ void FUltralightUEModule::StartupModule()
 	if (WebCoreHandle && UltralightCoreHandle && UltralightHandle)
 	{
 		// Startup Ultralight engine.
-		ultralightue::UltralightUEStartup();
+		ultralightue::NotifyUltralightUEStartup();
 	}
 	else
 	{
@@ -79,7 +78,7 @@ void FUltralightUEModule::ShutdownModule()
 	DestroyUltralightHandles();
 }
 
-bool FUltralightUEModule::LoadUltralightResources(FPakFile& p_resourcepak)
+bool FUltralightUEModule::CheckUltralightResources(FPakFile& p_resourcepak)
 {
 	if (p_resourcepak.GetIsMounted() && p_resourcepak.FindPrunedDirectory(TEXT("uicontent")))
 	{
@@ -89,7 +88,7 @@ bool FUltralightUEModule::LoadUltralightResources(FPakFile& p_resourcepak)
 	return false;
 }
 
-bool FUltralightUEModule::LoadUltralightResources(FString& path)
+bool FUltralightUEModule::CheckUltralightResources(FString& path)
 {
 	/// First get the content directory, and check if uiresources are listed there.
 	if (path.IsEmpty())

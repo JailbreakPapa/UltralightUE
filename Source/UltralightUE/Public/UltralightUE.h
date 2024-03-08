@@ -22,10 +22,10 @@
  */
 
 #pragma once
-
 #include "Modules/ModuleManager.h"
+#include "../../PakFile/Public/IPlatformFilePak.h"
 
-class FPakFile;
+
 namespace ultralightue
 {
 	class ULUELogInterface;
