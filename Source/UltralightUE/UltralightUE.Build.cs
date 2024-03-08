@@ -31,8 +31,8 @@ public class UltralightUE : ModuleRules
 
         PublicIncludePaths.AddRange(
             new string[] {
-				// ... add public include paths required here ...
-			}
+
+            }
             );
 
         PrivateIncludePaths.AddRange(
@@ -46,7 +46,8 @@ public class UltralightUE : ModuleRules
             {
                 "Core",
                 "UltralightUELibrary",
-                "Projects"
+                "Projects",
+                 "Core", "CoreUObject", "Engine", "InputCore", "PakFile", "RSA" 
 				// ... add other public dependencies that you statically link with here ...
 			}
             );

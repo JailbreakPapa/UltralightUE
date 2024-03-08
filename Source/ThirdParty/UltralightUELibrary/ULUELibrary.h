@@ -22,15 +22,11 @@
  */
 #pragma once
 #include "ULUEDefines.h"
-
+#include "Core.h"
 namespace ultralightue
 {
-	ULTRALIGHTUE_EXPORT void UltralightUEStartup()
+	ULTRALIGHTUE_EXPORT void NotifyUltralightUEStartup()
 	{
-#if defined _WIN32 || defined _WIN64
-		MessageBox(NULL, TEXT("Loaded Ultralight Dll(s) from Pre-built binaries."), TEXT("UltralightUE"), MB_OK);
-#else
-		printf("Loaded Ultralight Dll(s) from Pre-built binaries.");
-#endif
+		UE_LOG(LogTemp, Log, TEXT("Loaded Ultralight Dll(s) from Pre-built binaries."));
 	}
 }

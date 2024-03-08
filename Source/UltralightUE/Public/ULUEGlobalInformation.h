@@ -22,30 +22,10 @@
  */
 
 #pragma once
+#include <UltralightUELibrary/ULUEDefines.h>
+#include "CoreMinimal.h"
 
-#include "CanvasTypes.h"
-#include "Engine/TextureRenderTarget2D.h"
-#include "ULUERenderTarget.generated.h"
 namespace ultralightue
 {
-    UCLASS()
-    class ULTRALIGHTUE_EXPORT ULUERenderTarget : public UObject
-    {
-        GENERATED_BODY();
-
-    public:
-        UPROEPRTY(transient, EditAnywhere, BlueprintReadWrite, Category = "ULUERenderTargets")
-        UTextureRenderTarget2D *m_renderTarget;
-
-        FCanvas *m_canvas;
-
-        void BeginPaint(float InRealTime, float InWorldTime, float InWorldDeltaTime, ERHIFeatureLevel::Type FeatureLevel);
-        void EndPaint();
-        void Destroy();
-
-        static ULUERenderTarget *CreateTransient(uint32 InSizeX, uint32 InSizeY, EPixelFormat InFormat, const FColor &InClearColor);
-
-    private:
-    protected:
-    }
+	class 
 }

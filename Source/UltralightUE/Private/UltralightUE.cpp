@@ -20,12 +20,15 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-
 #include "UltralightUE.h"
+#include <ULUELogInterface.h>
 #include "Core.h"
+#include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
-#include "UltralightUELibrary/ULUELibrary.h"
+#include <ThirdParty/UltralightUELibrary/ULUELibrary.h>
+
+
 
 #define LOCTEXT_NAMESPACE "FUltralightUEModule"
 
@@ -38,12 +41,10 @@ void FUltralightUEModule::StartupModule()
 
 	// Add on the relative location of the ultralight dll(s) and load them.
 #if PLATFORM_WINDOWS
-	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/AppCore.dll"));
 	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/WebCore.dll"));
 	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/UltralightCore.dll"));
 	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/Win64/Ultralight.dll"));
 #elif PLATFORM_MAC
-	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libAppCore.dylib"));
 	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralight.dylib"));
 	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralightCore.dylib"));
 	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Source/ThirdParty/UltralightUELibrary/Mac/Release/libWebCore.dylib"));
@@ -51,20 +52,16 @@ void FUltralightUEModule::StartupModule()
 	AppCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libWebCore.so"));
 	WebCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libUltralightCore.so"));
 	UltralightCoreLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libUltralight.so"));
-	UltralightLibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/UltralightUELibrary/Linux/x86_64-unknown-linux-gnu/libAppCore.so"));
 #endif // PLATFORM_WINDOWS
 	/// Assign handles to Library(s) path(s).
-
-	AppCoreHandle = !AppCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*AppCoreLibraryPath) : nullptr;
 	WebCoreHandle = !WebCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*WebCoreLibraryPath) : nullptr;
 	UltralightCoreHandle = !UltralightCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*UltralightCoreLibraryPath) : nullptr;
 	UltralightHandle = !UltralightLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*UltralightLibraryPath) : nullptr;
 
-	if (AppCoreHandle && WebCoreHandle && UltralightCoreHandle && UltralightHandle != nullptr)
+	if (WebCoreHandle && UltralightCoreHandle && UltralightHandle)
 	{
-		// Call the function in the Ultralight library that opens a message box, notifying the user that the library has opened.
-		ultralightue::UltralightUEStartup();
-		// TODO: Startup Ultralight engine.
+		// Startup Ultralight engine.
+		ultralightue::NotifyUltralightUEStartup();
 	}
 	else
 	{
@@ -81,16 +78,43 @@ void FUltralightUEModule::ShutdownModule()
 	DestroyUltralightHandles();
 }
 
-bool FUltralightUEModule::LoadUltralightResources(FPakFile& p_resourcepak)
+bool FUltralightUEModule::CheckUltralightResources(FPakFile& p_resourcepak)
 {
-	/// Looks like we were able to get all needed resources.
-	return true;
+	if (p_resourcepak.GetIsMounted() && p_resourcepak.FindPrunedDirectory(TEXT("uicontent")))
+	{
+		/// Looks like we were able to get all needed resources.
+		return true;
+	}
+	return false;
 }
 
-bool FUltralightUEModule::LoadUltralightResources(FString& path)
+bool FUltralightUEModule::CheckUltralightResources(FString& path)
 {
-	/// Looks like we were able to get all needed resources.
-	return true;
+	/// First get the content directory, and check if uiresources are listed there.
+	if (path.IsEmpty())
+	{
+		path = { FPaths::ProjectContentDir() + "/" + "uicontent" };
+	}
+	if (FPaths::DirectoryExists(path))
+	{
+		/// Looks like we were able to get all needed resources.
+		return true;
+	}
+	else {
+		GetLogInterface()->LogWarning("UltralightUE: Failed to find UIContent! ");
+		return false;
+	}
+	return false;
+}
+
+void FUltralightUEModule::SetLoggingInterface(ultralightue::ULUELogInterface& in_logginginterface)
+{
+	m_loginterface = &in_logginginterface;
+}
+
+ultralightue::ULUELogInterface* FUltralightUEModule::GetLogInterface() const
+{
+    return static_cast<ultralightue::ULUELogInterface*>(m_loginterface);
 }
 
 void FUltralightUEModule::DestroyUltralightHandles()
@@ -98,11 +122,9 @@ void FUltralightUEModule::DestroyUltralightHandles()
 	FPlatformProcess::FreeDllHandle(UltralightHandle);
 	FPlatformProcess::FreeDllHandle(UltralightCoreHandle);
 	FPlatformProcess::FreeDllHandle(WebCoreHandle);
-	FPlatformProcess::FreeDllHandle(AppCoreHandle);
 	UltralightHandle = nullptr;
 	UltralightCoreHandle = nullptr;
 	WebCoreHandle = nullptr;
-	AppCoreHandle = nullptr;
 }
 
 #undef LOCTEXT_NAMESPACE
