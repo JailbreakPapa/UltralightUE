@@ -20,13 +20,12 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+
 #pragma once
-#include "ULUEDefines.h"
-#include "Core.h"
+#include <UltralightUELibrary/ULUEDefines.h>
+#include "CoreMinimal.h"
+
 namespace ultralightue
 {
-	ULTRALIGHTUE_EXPORT void NotifyUltralightUEStartup()
-	{
-		UE_LOG(LogTemp, Log, TEXT("Loaded Ultralight Dll(s) from Pre-built binaries."));
-	}
+	class 
 }

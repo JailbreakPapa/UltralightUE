@@ -61,9 +61,8 @@ void FUltralightUEModule::StartupModule()
 
 	if (WebCoreHandle && UltralightCoreHandle && UltralightHandle)
 	{
-		// Call the function in the Ultralight library that opens a message box, notifying the user that the library has opened.
+		// Startup Ultralight engine.
 		ultralightue::UltralightUEStartup();
-		// TODO: Startup Ultralight engine.
 	}
 	else
 	{
