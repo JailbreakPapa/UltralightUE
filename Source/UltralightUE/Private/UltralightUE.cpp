@@ -24,6 +24,7 @@
 #include <ULUELogInterface.h>
 #include "Core.h"
 #include "Misc/Paths.h"
+#include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include <ThirdParty/UltralightUELibrary/ULUELibrary.h>
@@ -115,6 +116,16 @@ void FUltralightUEModule::SetLoggingInterface(ultralightue::ULUELogInterface& in
 ultralightue::ULUELogInterface* FUltralightUEModule::GetLogInterface() const
 {
     return static_cast<ultralightue::ULUELogInterface*>(m_loginterface);
+}
+
+void FUltralightUEModule::SetLoggingInterface(ULUELogInterface& in_logginginterface)
+{
+	m_loginterface = std::move(in_logginginterface);
+}
+
+ULUELogInterface *FUltralightUEModule::GetLogInterface() const
+{
+    return static_cast<const ULUELogInterface>(m_loginterface);
 }
 
 void FUltralightUEModule::DestroyUltralightHandles()
