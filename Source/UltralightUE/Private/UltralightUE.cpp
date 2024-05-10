@@ -27,9 +27,8 @@
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
+
 #include <ThirdParty/UltralightUELibrary/ULUELibrary.h>
-
-
 
 #define LOCTEXT_NAMESPACE "FUltralightUEModule"
 
@@ -79,6 +78,11 @@ void FUltralightUEModule::ShutdownModule()
 	DestroyUltralightHandles();
 }
 
+bool FUltralightUEModule::IsAvailable()
+{
+	return FModuleManager::Get().IsModuleLoaded("UltralightUE");
+}
+
 bool FUltralightUEModule::CheckUltralightResources(FPakFile& p_resourcepak)
 {
 	if (p_resourcepak.GetIsMounted() && p_resourcepak.FindPrunedDirectory(TEXT("uicontent")))
@@ -89,7 +93,7 @@ bool FUltralightUEModule::CheckUltralightResources(FPakFile& p_resourcepak)
 	return false;
 }
 
-bool FUltralightUEModule::CheckUltralightResources(FString& path)
+bool FUltralightUEModule::CheckUltralightResources(FString& path) const
 {
 	/// First get the content directory, and check if uiresources are listed there.
 	if (path.IsEmpty())
@@ -105,7 +109,12 @@ bool FUltralightUEModule::CheckUltralightResources(FString& path)
 		GetLogInterface()->LogWarning("UltralightUE: Failed to find UIContent! ");
 		return false;
 	}
-	return false;
+}
+
+
+ultralightue::ULUELogInterface* FUltralightUEModule::GetLogInterface() const
+{
+    return m_loginterface;
 }
 
 void FUltralightUEModule::SetLoggingInterface(ultralightue::ULUELogInterface& in_logginginterface)
@@ -113,20 +122,6 @@ void FUltralightUEModule::SetLoggingInterface(ultralightue::ULUELogInterface& in
 	m_loginterface = &in_logginginterface;
 }
 
-ultralightue::ULUELogInterface* FUltralightUEModule::GetLogInterface() const
-{
-    return static_cast<ultralightue::ULUELogInterface*>(m_loginterface);
-}
-
-void FUltralightUEModule::SetLoggingInterface(ULUELogInterface& in_logginginterface)
-{
-	m_loginterface = std::move(in_logginginterface);
-}
-
-ULUELogInterface *FUltralightUEModule::GetLogInterface() const
-{
-    return static_cast<const ULUELogInterface>(m_loginterface);
-}
 
 void FUltralightUEModule::DestroyUltralightHandles()
 {

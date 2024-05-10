@@ -23,7 +23,7 @@
 
 #pragma once
 #include <Ultralight/platform/FileSystem.h>
-#include <UltralightUELibrary/ULUEDefines.h>
+#include <ThirdParty/UltralightUELibrary/ULUEDefines.h>
 namespace ultralightue
 {
     enum class ULTRALIGHTUE_EXPORT FSAccess : int
@@ -41,10 +41,16 @@ namespace ultralightue
     {
         public:
             void SetFSAccess(ultralightue::FSAccess& in_accesspattern);
-
             
+            virtual bool FileExists(const ultralight::String& file_path) override;
+
+            virtual ultralight::String GetFileMimeType(const ultralight::String& file_path) override;
+
+            virtual ultralight::String GetFileCharset(const ultralight::String& file_path) override;
+
+            virtual ultralight::RefPtr<ultralight::Buffer> OpenFile(const ultralight::String& file_path) override;
         private:
             ultralightue::FSAccess m_access = FSAccess::FSA_Native;
         protected:
-    }
+    };
 }

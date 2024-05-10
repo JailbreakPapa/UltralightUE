@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) 2024 Mikael Aboagye & Ultralight Inc.
+ *   Copyright (c) 2023 Mikael Aboagye & Ultralight Inc.
  *   All rights reserved.
 
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -8,10 +8,10 @@
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
-
+ 
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
-
+ 
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,42 +22,30 @@
  */
 
 #pragma once
-#include "Rendering/RenderingCommon.h"
-#include "UltralightUE.h"
 
-class FULUETextureHandle;
-struct FULUEVertData;
+class FString;
 
 namespace ultralightue
 {
-    class FULUERawMesh : public TSharedFromThis<FULUERawMesh, ESPMode::ThreadSafe>
+    /// @brief Simple class for developers to assign logging interfaces to the plugin.
+    /// NOTE: By default, the plugin will log to the console like normal, using color codes like: red, yellow, and white.
+    class ULUELogInterface
     {
-    public:
-        struct FVertexData
-        {
-            FVector2D Position;
-            FColor Color;
-            FVector2D UV;
-            FVertexData(const FVector2D &InPos, const FVector2D &InUV, const FColor &InColor)
-                : Position(InPos), Color(InColor), UV(InUV)
-            {
-            }
-        };
-        void Setup(FULUEVertData *vertices, int num_vertices, int *indices, int num_indices, TSharedPtr<FULUETextureHandle, ESPMode::ThreadSafe> InTexture);
-        void BuildMesh();
-        void ReleaseMesh();
-        void DrawMesh(FRHICommandList &RHICmdList);
+        public:
+        
+            /// @brief Logs a error within the developer defined interface.
+            /// @param details What the error message will contain.
+            virtual void LogError(FString details);
 
-    public:
-        TResourceArray<FVertexData> Vertices;
-        FVertexBufferRHIRef VertexBufferRHI;
+            /// @brief Logs a warning within the developer defined interface.
+            /// @param details What the warning message will contain.
+            virtual void LogWarning(FString details);
 
-        TResourceArray<uint16> Indices;
-        FIndexBufferRHIRef IndexBufferRHI;
+            /// @brief Logs a info within the developer defined interface.
+            /// @param details What the info message will contain.            
+            virtual void LogInfo(FString details);
 
-        int32 NumVertices;
-        int32 NumTriangles;
-
-        TSharedPtr<FULUETextureHandle, ESPMode::ThreadSafe> BoundTexture;
+        protected:
+        private:
     };
 }

@@ -22,42 +22,51 @@
  */
 
 #pragma once
+
 #include "Rendering/RenderingCommon.h"
 #include "UltralightUE.h"
-
-class FULUETextureHandle;
-struct FULUEVertData;
+#include "ULUERawMesh.h"
 
 namespace ultralightue
 {
-    class FULUERawMesh : public TSharedFromThis<FULUERawMesh, ESPMode::ThreadSafe>
+    class FULUERenderer
     {
-    public:
-        struct FVertexData
+        FULUERenderer();
+        FULUERenderer(
+            TSharedPtr<FULUERawMesh, ESPMode::ThreadSafe> InBoundMesh,
+            const FMatrix &InRenderTransform,
+            const FIntRect &InScissorRect)
+            : BoundMesh(InBoundMesh), RenderTransform(InRenderTransform), ScissorRect(InScissorRect)
         {
-            FVector2D Position;
-            FColor Color;
-            FVector2D UV;
-            FVertexData(const FVector2D &InPos, const FVector2D &InUV, const FColor &InColor)
-                : Position(InPos), Color(InColor), UV(InUV)
-            {
-            }
-        };
-        void Setup(FULUEVertData *vertices, int num_vertices, int *indices, int num_indices, TSharedPtr<FULUETextureHandle, ESPMode::ThreadSafe> InTexture);
-        void BuildMesh();
-        void ReleaseMesh();
-        void DrawMesh(FRHICommandList &RHICmdList);
+        }
 
-    public:
-        TResourceArray<FVertexData> Vertices;
-        FVertexBufferRHIRef VertexBufferRHI;
-
-        TResourceArray<uint16> Indices;
-        FIndexBufferRHIRef IndexBufferRHI;
-
-        int32 NumVertices;
-        int32 NumTriangles;
-
-        TSharedPtr<FULUETextureHandle, ESPMode::ThreadSafe> BoundTexture;
+        TSharedPtr<FULUERawMesh, ESPMode::ThreadSafe> BoundMesh;
+        FMatrix RenderTransform;
+        FIntRect ScissorRect;
     };
+
+    class FULUEGeometryDrawer : public ICustomSlateElement
+    {
+        FULUEGeometryDrawer(bool bUsing = false);
+
+        virtual void DrawRenderThread(FRHICommandListImmediate &RHICmdList, const void* RenderTarget) override;
+
+        FORCEINLINE void EmplaceMesh(
+            TSharedPtr<FULUERawMesh, ESPMode::ThreadSafe> InBoundMesh,
+            const FMatrix &InRenderTransform,
+            const FIntRect &InScissorRect)
+        {
+            Renderers.Emplace(InBoundMesh, InRenderTransform, InScissorRect);
+        }
+
+        bool IsFree() const { return !bUsing; }
+
+        void MarkUsing() { bUsing = true; }
+        void MarkFree() { bUsing = false; }
+
+        private:
+        TArray<FULUERawMesh> Renderers;
+        bool bUsing = false;
+    };
+
 }

@@ -22,16 +22,16 @@
  */
 
 #pragma once
-#include "Modules/ModuleManager.h"
-#include "../../PakFile/Public/IPlatformFilePak.h"
 
+#include "../../PakFile/Public/IPlatformFilePak.h"
+#include "Modules/ModuleManager.h"
 
 namespace ultralightue
 {
 	class ULUELogInterface;
 }
 
-class FUltralightUEModule : public IModuleInterface
+class FUltralightUEModule final : public IModuleInterface
 {
 public:
 	/** IModuleInterface implementation */
@@ -53,21 +53,18 @@ public:
 	 *
 	 * @return True if the module is loaded and ready to use
 	 */
-	static inline bool IsAvailable()
-	{
-		return FModuleManager::Get().IsModuleLoaded("UltralightUE");
-	}
+	static inline bool IsAvailable();
 
 	/// @brief Loads Ultralight Resources Needed for Runtime. (through package files)
 	/// This will require the resource package containing the .dat, and the certification file that was included with the plugin.
 	/// NOTE: Developers who choose to package ultralight assets with pak(s), will have to handle packaging those assets.
 	/// It is recommended to use a native file interface for packaging resource files.
-	bool CheckUltralightResources(FPakFile &p_resourcepak);
+	static bool CheckUltralightResources(FPakFile &p_resourcepak);
 
 	/// @brief Loads Ultralight Resources Needed for Runtime. (through native filesystem)
 	/// This will require the resource package containing the .dat, and the certification file that was included with the plugin.
 	/// @param Path The path that the plugin will look for resource files. this CAN be empty, the plugin will assume the resources will be in: ({GAMECONTENTPATH}\\uicontent).
-	bool CheckUltralightResources(FString &path);
+	bool CheckUltralightResources(FString &path) const;
 
 	/// @brief Sets & Uses the Logging interface to integrate with Ultralight.
 	/// @param in_logginginterface Interface to be used.
@@ -75,7 +72,7 @@ public:
 
 	/// @brief Get the log interface.
 	/// @return
-	ultralightue::ULUELogInterface *GetLogInterface() const;
+	ultralightue::ULUELogInterface* GetLogInterface() const;
 	/// @brief Web Core Library Path.
 	FString WebCoreLibraryPath;
 	/// @brief Ultralight Core Library Path.
@@ -87,7 +84,7 @@ private:
 	/// @brief Destroys the Ultralight DLL handles. This should ONLY be called at shutdown.
 	void DestroyUltralightHandles();
 
-	ultralightue::ULUELogInterface *m_loginterface = nullptr;
+	ultralightue::ULUELogInterface* m_loginterface = nullptr;
 	/// Handles to Ultralight DLL(s).
 
 	/// @brief Ultralight Core DLL Handle.
