@@ -21,13 +21,27 @@
  *   SOFTWARE.
  */
 #include "UltralightUE/Public/ULUELogInterface.h"
+#include "Internal/ULUEILoggerInterface.h"
 
 #include "Containers/UnrealString.h"
 #include "Logging/LogMacros.h"
+#include "ULUELogInterface.h"
+
+ultralightue::ULUELogInterface::ULUELogInterface()
+{
+	if(LoggerInterface == nullptr)
+	{
+		LoggerInterface = new ULUEILoggerInterface();
+	}
+	else
+	{
+		LoggerInterface = nullptr;
+	}
+}
 
 void ultralightue::ULUELogInterface::LogError(FString details)
 {
-	UE_LOG(LogTemp, Error, TEXT("UltralightUE Error: %s"), *details);
+
 }
 
 void ultralightue::ULUELogInterface::LogWarning(FString details)
