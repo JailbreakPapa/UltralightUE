@@ -9,7 +9,7 @@ Current Supported Ultralight Version: 1.4.0 - stable
 
 # Unreal Versions
 
-Currently, the plugin is being developed on 5.3, but there are plans to back port to UE 4.27 for wider use.
+5.5 and Up.
 
 # Documentation
 
