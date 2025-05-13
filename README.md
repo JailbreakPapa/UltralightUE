@@ -1,11 +1,11 @@
 # UltralightUE
 Ultralight UI Support for Unreal Engine 4.27.2 +.
 
-**Ultralight Inc. is in no way assosiated with this project in a professional matter. support should be directed towards WD Studios L.L.C. (https://wdstudios.tech)**
+**Ultralight Inc. is in no way assosiated with this project in a professional matter. support should be directed towards this Repo Author (@JailbreakPapa) , and NOT WD Studios Corp.**
 
 **This Project includes Ultralight Binaries & Includes. BY USING THIS LIBRARY, YOU ACCEPT Ultralight's EULA.**
 
-Current Supported Ultralight Version: 1.3.0 - stable
+Current Supported Ultralight Version: 1.4.0 - stable
 
 # Unreal Versions
 
@@ -20,22 +20,6 @@ Documentation is currently being worked on, but will be contained within the rep
 Currently Supported Platforms with the plugin are: Windows. 
 
 *Please Note*: Any platform, NDA, or not, can be added with the plugin with little, to no changes. 
-
-If you do prefer to get access for the NDA Platforms, instead of modifying it your self, feel free to contact us. 
-
-contact: contact@wdstudios.tech for access. (**Will require you to already have asked Ultralight Inc. for base access to the Platform Binaries!**)
-
-You *Will* have to be a "partner" of the requested platform (If it is a Console/NDA Platform)
-
-
-
-## Console Platforms
-
-For Console Platforms, Xbox One, Series X/S, Playstation 4 and 5 are currently now Supported! 
-
-***Due to being an open-source project, This plugin WILL NOT give binary downloads of any kind for Console Platforms, or assist in anyway for console platforms.***
-
-***Support for these platforms In-terms of requesting access should be redirected to Ultralight Inc. any PLUGIN issues should be redirected here.***
 
 # License
 
