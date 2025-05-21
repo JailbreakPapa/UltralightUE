@@ -25,7 +25,4 @@
 #include <UltralightUELibrary/ULUEDefines.h>
 #include "CoreMinimal.h"
 
-namespace ultralightue
-{
-	class 
-}
+// NOTE MOVED TO EDITOR MODULE.

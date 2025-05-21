@@ -1,17 +1,17 @@
 /*
  *   Copyright (c) 2023 Mikael Aboagye & Ultralight Inc.
  *   All rights reserved.
-
+ *
  *   Permission is hereby granted, free of charge, to any person obtaining a copy
  *   of this software and associated documentation files (the "Software"), to deal
  *   in the Software without restriction, including without limitation the rights
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- 
+ *
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
- 
+ *
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,49 +21,54 @@
  *   SOFTWARE.
  */
 
+using System.IO;
 using UnrealBuildTool;
 
 public class UltralightUE : ModuleRules
 {
-    public UltralightUE(ReadOnlyTargetRules Target) : base(Target)
-    {
-        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-
-        PublicIncludePaths.AddRange(
-            new string[] {
-
-            }
-            );
-
-        PrivateIncludePaths.AddRange(
-            new string[] {
-				// ... add other private include paths required here ...
+	public UltralightUE(ReadOnlyTargetRules Target) : base(Target)
+	{
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+		// Add include paths for UltralightUELibrary and Ultralight SDK
+		PublicIncludePaths.AddRange(
+			new[]
+			{
+				// UltralightUELibrary module include path
+				Path.Combine(ModuleDirectory, "../../Source/ThirdParty/UltralightUELibrary"),
+				// Ultralight SDK include path
+				Path.Combine(ModuleDirectory, "../../Source/ThirdParty/UltralightUELibrary/Include")
 			}
-            );
+		);
 
-        PublicDependencyModuleNames.AddRange(
-            new string[]
-            {
-                "Core",
-                "UltralightUELibrary",
-                "Projects",
-                 "Core", "CoreUObject", "Engine", "InputCore", "PakFile", "RSA" 
-				// ... add other public dependencies that you statically link with here ...
+		PrivateIncludePaths.AddRange(
+			new string[]
+			{
+				// Add private include paths if needed
 			}
-            );
+		);
 
-        PrivateDependencyModuleNames.AddRange(
-            new string[]
-            {
-				// ... add private dependencies that you statically link with here ...
+		// Consolidated dependencies
+		PublicDependencyModuleNames.AddRange(
+			new[]
+			{
+				"Core",
+				"CoreUObject",
+				"Engine",
+				"InputCore",
+				"Renderer",
+				"RenderCore",
+				"Projects",
+				"PakFile",
+				"RSA",
+				"UltralightUELibrary" // Dependency on UltralightUELibrary module
 			}
-            );
+		);
 
-        DynamicallyLoadedModuleNames.AddRange(
-            new string[]
-            {
-				// ... add any modules that your module loads dynamically here ...
+		PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
+				// Add private dependencies if needed
 			}
-            );
-    }
+		);
+	}
 }

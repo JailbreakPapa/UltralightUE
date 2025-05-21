@@ -1,134 +1,154 @@
-#include
-
+#include "FileSystem/ULUEFileSystem.h"
 #include <Ultralight/Ultralight.h>
+#include "InterchangeHelper.h"
 #include "HAL/PlatformFileManager.h"
 #include "HAL/FileManager.h"
 #include "Misc/Paths.h"
-#include "ULUEFileSystem.h"
+#include "GenericPlatform/GenericPlatformMisc.h"
 
-namespace ultralightue
+TMap<FString, TArray<uint8>> UEFileSystem::VirtualFiles;
+
+UEFileSystem::UEFileSystem(const FString& baseDir)
+	: BaseDir(baseDir)
 {
-    void ULUEFileSystem::SetFSAccess(ultralightue::FSAccess &in_accesspattern)
-    {
-        m_access = in_accesspattern;
-    }
+	// Ensure BaseDir ends with a separator
+	if (!BaseDir.EndsWith(TEXT("/")) && !BaseDir.EndsWith(TEXT("\\")))
+	{
+		BaseDir += TEXT("/");
+	}
+}
 
-    ULUEFileSystem::ULUEFileSystem()
-    {
-        // TODO: Load the base directory from the config file set by the user.
-    }
+UEFileSystem::~UEFileSystem()
+{
+}
 
-    bool ULUEFileSystem::FileExists(const ultralight::String &path)
-    {
-        FString uePath = MapPath(path);
-        IPlatformFile &platformFile = FPlatformFileManager::Get().GetPlatformFile();
-        return platformFile.FileExists(*uePath);
-    }
-    bool ULUEFileSystem::GetFileSize(ultralight::FileHandle handle, int64_t &result)
-    {
-        IFileHandle *fileHandle = static_cast<IFileHandle *>(handle);
-        if (fileHandle)
-        {
-            result = fileHandle->Size();
-            return true;
-        }
-        return false;
-    }
-    ultralight::FileHandle ULUEFileSystem::OpenFile(const ultralight::String &path, bool open_for_writing)
-    {
-        FString uePath = MapPath(path);
-        IPlatformFile &platformFile = FPlatformFileManager::Get().GetPlatformFile();
-        IFileHandle *handle = nullptr;
-        if (open_for_writing)
-        {
-            handle = platformFile.OpenWrite(*uePath);
-        }
-        else
-        {
-            handle = platformFile.OpenRead(*uePath);
-        }
-        return handle ? static_cast<ultralight::FileHandle>(handle) : nullptr;
-    }
-    void ULUEFileSystem::CloseFile(ultralight::FileHandle &handle)
-    {
-        IFileHandle *fileHandle = static_cast<IFileHandle *>(handle);
-        if (fileHandle)
-        {
-            delete fileHandle; // Unreal Engine requires manual deletion of IFileHandle
-            handle = nullptr;
-        }
-    }
-    bool ULUEFileSystem::ReadFromFile(ultralight::FileHandle handle, char *data, int64_t length)
-    {
-        IFileHandle *fileHandle = static_cast<IFileHandle *>(handle);
-        if (fileHandle)
-        {
-            return fileHandle->Read(reinterpret_cast<uint8_t *>(data), length);
-        }
-        return false;
-    }
-    bool ULUEFileSystem::GetFileMimeType(const ultralight::String &path, ultralight::String &result)
-    {
-        FString uePath = FString(path.utf8().data());
-        if (uePath.EndsWith(TEXT(".html")))
-        {
-            result = ultralight::String("text/html");
-            return true;
-        }
-        else if (uePath.EndsWith(TEXT(".css")))
-        {
-            result = ultralight::String("text/css");
-            return true;
-        }
-        else if (uePath.EndsWith(TEXT(".js")))
-        {
-            result = ultralight::String("application/javascript");
-            return true;
-        }
-        // NOTE/TODO (Mikael A.): We could add more but, these are the most common ones.
-        result = ultralight::String("application/octet-stream");
-        return true;
-    }
-    bool ULUEFileSystem::GetFileCharset(const ultralight::String &path, ultralight::String &result)
-    {
-        result = ultralight::String("utf-8");
-        return true;
-    }
-    // (Mikael A.): I mean, i dont think UL will EVER use this, but we can add it for completeness.
-    bool ULUEFileSystem::GetFileCreationTime(const ultralight::String &path, int64_t &result)
-    {
-        FString uePath = MapPath(path);
-        IPlatformFile &platformFile = FPlatformFileManager::Get().GetPlatformFile();
-        FDateTime creationTime;
-        if (platformFile.GetTimeStamp(*uePath, creationTime))
-        {
-            result = creationTime.ToUnixTimestamp();
-            return true;
-        }
-        return false;
-    }
-    // (Mikael A.): I mean, i dont think UL will EVER use this, but we can add it for completeness.
-    bool ULUEFileSystem::GetFileLastModificationTime(const ultralight::String &path, int64_t &result)
-    {
-        FString uePath = MapPath(path);
-        IPlatformFile &platformFile = FPlatformFileManager::Get().GetPlatformFile();
-        FDateTime modificationTime;
-        if (platformFile.GetTimeStamp(*uePath, modificationTime))
-        {
-            result = modificationTime.ToUnixTimestamp();
-            return true;
-        }
-        return false;
-    }
-    // Map Ultralight path to Unreal Engine virtual path
-    FString ULUEFileSystem::MapPath(const ultralight::String& path)
-    {
-        FString ultralightPath = FString(path.utf8().data());
-        // Remove any leading slashes to avoid double slashes
-        if (ultralightPath.StartsWith(TEXT("/")))
-        {
-            ultralightPath = ultralightPath.Mid(1);
-        }
-        return BaseDirectory / ultralightPath;
-    }
+void UEFileSystem::RegisterVirtualFile(const FString& virtualPath, const TArray<uint8>& data)
+{
+	VirtualFiles.Add(virtualPath, data);
+}
+
+bool UEFileSystem::FileExists(const ultralight::String& file_path)
+{
+	FString fullPath = GetFullPath(file_path);
+	return FPaths::FileExists(fullPath);
+}
+
+ultralight::String UEFileSystem::GetFileMimeType(const ultralight::String& file_path)
+{
+	FString path = ToFString(file_path).ToLower();
+	FString extension = FPaths::GetExtension(path, false);
+
+	if (extension == TEXT("html") || extension == TEXT("htm"))
+	{
+		return ultralight::String("text/html");
+	}
+	if (extension == TEXT("css"))
+	{
+		return ultralight::String("text/css");
+	}
+	if (extension == TEXT("js"))
+	{
+		return ultralight::String("application/javascript");
+	}
+	if (extension == TEXT("png"))
+	{
+		return ultralight::String("image/png");
+	}
+	if (extension == TEXT("jpg") || extension == TEXT("jpeg"))
+	{
+		return ultralight::String("image/jpeg");
+	}
+	if (extension == TEXT("gif"))
+	{
+		return ultralight::String("image/gif");
+	}
+	if (extension == TEXT("svg"))
+	{
+		return ultralight::String("image/svg+xml");
+	}
+	if (extension == TEXT("txt"))
+	{
+		return ultralight::String("text/plain");
+	}
+
+	return ultralight::String("application/unknown");
+}
+
+ultralight::String UEFileSystem::GetFileCharset(const ultralight::String& file_path)
+{
+	// For simplicity, return "utf-8" for text-based files
+	FString path = ToFString(file_path).ToLower();
+	FString extension = FPaths::GetExtension(path, false);
+
+	if (extension == TEXT("html") || extension == TEXT("htm") ||
+		extension == TEXT("css") || extension == TEXT("js") ||
+		extension == TEXT("txt"))
+	{
+		return ultralight::String("utf-8");
+	}
+
+	return ultralight::String("utf-8"); // Default safe charset
+}
+
+ultralight::RefPtr<ultralight::Buffer> UEFileSystem::OpenFile(const ultralight::String& file_path)
+{
+	FString fullPath = GetFullPath(file_path);
+	TArray<uint8> fileData;
+
+	if (!FFileHelper::LoadFileToArray(fileData, *fullPath))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UEFileSystem: Failed to load file %s"), *fullPath);
+		return nullptr;
+	}
+
+	// Allocate aligned memory for ICU data file (16-byte alignment)
+	bool isIcuFile = fullPath.EndsWith(TEXT("icudt67l.dat"), ESearchCase::IgnoreCase);
+	size_t dataSize = fileData.Num();
+	void* dataPtr = nullptr;
+
+	if (isIcuFile)
+	{
+		// Use aligned allocation for ICU data
+		dataPtr = FMemory::Malloc(dataSize, 16); // 16-byte alignment
+		if (!dataPtr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UEFileSystem: Failed to allocate aligned memory for %s"), *fullPath);
+			return nullptr;
+		}
+		FMemory::Memcpy(dataPtr, fileData.GetData(), dataSize);
+	}
+	else
+	{
+		// For non-ICU files, use Buffer::CreateFromCopy to ensure alignment
+		dataPtr = FMemory::Malloc(dataSize);
+		if (!dataPtr)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UEFileSystem: Failed to allocate memory for %s"), *fullPath);
+			return nullptr;
+		}
+		FMemory::Memcpy(dataPtr, fileData.GetData(), dataSize);
+	}
+
+	// Create Buffer...
+	return ultralight::Buffer::Create(dataPtr, dataSize, nullptr, nullptr);
+}
+
+FString UEFileSystem::ToFString(const ultralight::String& ulString) const
+{
+	// Convert Ultralight String (UTF-16) to FString
+	return FString(UTF16_TO_TCHAR(ulString.utf16().data()));
+}
+
+FString UEFileSystem::GetFullPath(const ultralight::String& file_path) const
+{
+	FString relativePath = ToFString(file_path);
+	// Replace forward slashes with platform-specific separator
+	relativePath.ReplaceInline(TEXT("/"), FGenericPlatformMisc::GetDefaultPathSeparator());
+	return FPaths::Combine(BaseDir, relativePath);
+}
+
+
+void UEFileSystem::RegisterFile(const FString& VirtualPath, const TArray<uint8>& Data)
+{
+	VirtualFiles.Add(VirtualPath, Data);
 }

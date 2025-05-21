@@ -21,21 +21,22 @@
  *   SOFTWARE.
  */
 #include "UltralightUE.h"
-#include <ULUELogInterface.h>
-#include "Core.h"
+#include "ULUELogInterface.h"
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include <ThirdParty/UltralightUELibrary/ULUELibrary.h>
-
-
+#include "FileSystem/ULUEFileSystem.h"
+#include "FontSystem/ULUEFontSystem.h"
+#include "Internal/ULUEILoggerInterface.h"
+#include "Runtime/PakFile/Public/IPlatformFilePak.h"
 
 #define LOCTEXT_NAMESPACE "FUltralightUEModule"
 
 void FUltralightUEModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-
+	UE_LOG(LogUltralightUE, Log, TEXT("Loading Ultralight Dll(s) from Pre-built binaries."));
 	// Get the base directory of this plugin
 	FString BaseDir = IPluginManager::Get().FindPlugin("UltralightUE")->GetBaseDir();
 
@@ -55,8 +56,12 @@ void FUltralightUEModule::StartupModule()
 #endif // PLATFORM_WINDOWS
 	/// Assign handles to Library(s) path(s).
 	WebCoreHandle = !WebCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*WebCoreLibraryPath) : nullptr;
-	UltralightCoreHandle = !UltralightCoreLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*UltralightCoreLibraryPath) : nullptr;
-	UltralightHandle = !UltralightLibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*UltralightLibraryPath) : nullptr;
+	UltralightCoreHandle = !UltralightCoreLibraryPath.IsEmpty()
+		                       ? FPlatformProcess::GetDllHandle(*UltralightCoreLibraryPath)
+		                       : nullptr;
+	UltralightHandle = !UltralightLibraryPath.IsEmpty()
+		                   ? FPlatformProcess::GetDllHandle(*UltralightLibraryPath)
+		                   : nullptr;
 
 	if (WebCoreHandle && UltralightCoreHandle && UltralightHandle)
 	{
@@ -65,7 +70,8 @@ void FUltralightUEModule::StartupModule()
 	}
 	else
 	{
-		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("UltralightUE: Error", "Failed to load UltralightUE! Please check the log for any messages. if you cant fix the issue, create a issue on github! (https://github.com/JailbreakPapa/UltralightUE)"));
+		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("UltralightUE: Error",
+		                                              "Failed to load UltralightUE! Please check the log for any messages. if you cant fix the issue, create a issue on github! (https://github.com/JailbreakPapa/UltralightUE)"));
 	}
 }
 
@@ -78,9 +84,18 @@ void FUltralightUEModule::ShutdownModule()
 	DestroyUltralightHandles();
 }
 
+bool FUltralightUEModule::StartupUltralight()
+{
+	m_loginterface = MakeShared<ULUELogInterface>();
+	// NOTE(Mikael A.): what ever pck contains the uiresources, should be accessible. this should be in the main content dir.
+	m_filesystem = MakeShared<UEFileSystem>("/uiresources");
+	m_fontsystem = MakeShared<ULUEFontSystem>();
+	return true;
+}
+
 bool FUltralightUEModule::CheckUltralightResources(FPakFile& p_resourcepak)
 {
-	if (p_resourcepak.GetIsMounted() && p_resourcepak.FindPrunedDirectory(TEXT("uicontent")))
+	if (p_resourcepak.GetIsMounted() && p_resourcepak.FindPrunedDirectory(TEXT("uiresources")))
 	{
 		/// Looks like we were able to get all needed resources.
 		return true;
@@ -93,28 +108,40 @@ bool FUltralightUEModule::CheckUltralightResources(FString& path)
 	/// First get the content directory, and check if uiresources are listed there.
 	if (path.IsEmpty())
 	{
-		path = { FPaths::ProjectContentDir() + "/" + "uicontent" };
+		path = {FPaths::ProjectContentDir() + "/" + "uiresources"};
 	}
 	if (FPaths::DirectoryExists(path))
 	{
 		/// Looks like we were able to get all needed resources.
 		return true;
 	}
-	else {
-		GetLogInterface()->LogWarning("UltralightUE: Failed to find UIContent! ");
-		return false;
-	}
+	GetLogInterface()->LogWarning("UltralightUE: Failed to find UIContent! ");
 	return false;
 }
 
-void FUltralightUEModule::SetLoggingInterface(ultralightue::ULUELogInterface& in_logginginterface)
+void FUltralightUEModule::SetLoggingInterface(ULUELogInterface& in_logginginterface)
 {
-	m_loginterface = &in_logginginterface;
+	m_loginterface = MakeShared<ULUELogInterface>(in_logginginterface);
 }
 
-ultralightue::ULUELogInterface* FUltralightUEModule::GetLogInterface() const
+void FUltralightUEModule::SetFileSystem(UEFileSystem& in_filesystem)
 {
-    return static_cast<ultralightue::ULUELogInterface*>(m_loginterface);
+	m_filesystem = MakeShared<UEFileSystem>(in_filesystem);
+}
+
+ULUEFontSystem* FUltralightUEModule::GetFontSystem() const
+{
+	return m_fontsystem.Get();
+}
+
+ULUELogInterface* FUltralightUEModule::GetLogInterface() const
+{
+	return m_loginterface.Get();
+}
+
+UEFileSystem* FUltralightUEModule::GetFileSystem() const
+{
+	return m_filesystem.Get();
 }
 
 void FUltralightUEModule::DestroyUltralightHandles()

@@ -22,14 +22,18 @@
  */
 
 #pragma once
+#include "IPlatformFilePak.h"
 #include "Modules/ModuleManager.h"
-#include "../../PakFile/Public/IPlatformFilePak.h"
 
 
-namespace ultralightue
-{
-	class ULUELogInterface;
-}
+class ULUEFontSystem;
+class FPakFile;
+class ULUELogInterface;
+class UEFileSystem;
+class ULUERenderManagerCPU;
+class ULUERenderManagerGPU;
+class ULUEInstance;
+
 
 class FUltralightUEModule : public IModuleInterface
 {
@@ -43,7 +47,7 @@ public:
 	 *
 	 * @return Returns singleton instance, loading the module on demand if needed
 	 */
-	static inline FUltralightUEModule &Get()
+	static FUltralightUEModule& Get()
 	{
 		return FModuleManager::LoadModuleChecked<FUltralightUEModule>("UltralightUE");
 	}
@@ -53,29 +57,45 @@ public:
 	 *
 	 * @return True if the module is loaded and ready to use
 	 */
-	static inline bool IsAvailable()
+	static bool IsAvailable()
 	{
 		return FModuleManager::Get().IsModuleLoaded("UltralightUE");
 	}
 
+	/// @brief Starts setting up Ultralight. this will require all requested dll(s), and interfaces to be ready.
+	/// @return if the startup was successful.
+	bool StartupUltralight();
+
 	/// @brief Loads Ultralight Resources Needed for Runtime. (through package files)
 	/// This will require the resource package containing the .dat, and the certification file that was included with the plugin.
-	/// NOTE: Developers who choose to package ultralight assets with pak(s), will have to handle packaging those assets.
+	/// NOTE: Developers who choose to package ultralight assets with pak(s), will have to handle packaging those assets. make sure there is a "/uiresources" entry!
 	/// It is recommended to use a native file interface for packaging resource files.
-	bool CheckUltralightResources(FPakFile &p_resourcepak);
+	bool CheckUltralightResources(FPakFile& p_resourcepak);
 
 	/// @brief Loads Ultralight Resources Needed for Runtime. (through native filesystem)
 	/// This will require the resource package containing the .dat, and the certification file that was included with the plugin.
 	/// @param Path The path that the plugin will look for resource files. this CAN be empty, the plugin will assume the resources will be in: ({GAMECONTENTPATH}\\uicontent).
-	bool CheckUltralightResources(FString &path);
+	bool CheckUltralightResources(FString& path);
 
 	/// @brief Sets & Uses the Logging interface to integrate with Ultralight.
 	/// @param in_logginginterface Interface to be used.
-	void SetLoggingInterface(ultralightue::ULUELogInterface &in_logginginterface);
+	void SetLoggingInterface(ULUELogInterface& in_logginginterface);
+	
+	/**
+	 * @brief Sets the filesystem to a new ref.
+	 * @warning DONT change when the engine is running; otherwise, a crash will occur.
+	 * @param in_filesystem the file system you want to set it to.
+	 */
+	void SetFileSystem(UEFileSystem& in_filesystem);
 
+	ULUEFontSystem* GetFontSystem() const;
 	/// @brief Get the log interface.
-	/// @return
-	ultralightue::ULUELogInterface *GetLogInterface() const;
+	/// @return Returns the log interface.
+	ULUELogInterface* GetLogInterface() const;
+	/// @brief Get the file system interface.
+	/// @return Returns the file system interface.
+	UEFileSystem* GetFileSystem() const;
+
 	/// @brief Web Core Library Path.
 	FString WebCoreLibraryPath;
 	/// @brief Ultralight Core Library Path.
@@ -87,15 +107,17 @@ private:
 	/// @brief Destroys the Ultralight DLL handles. This should ONLY be called at shutdown.
 	void DestroyUltralightHandles();
 
-	ultralightue::ULUELogInterface *m_loginterface = nullptr;
+	TSharedPtr<class ULUELogInterface> m_loginterface;
+	TSharedPtr<class UEFileSystem> m_filesystem;
+	TSharedPtr<class ULUEFontSystem> m_fontsystem;
 	/// Handles to Ultralight DLL(s).
 
 	/// @brief Ultralight Core DLL Handle.
-	void *UltralightCoreHandle;
+	void* UltralightCoreHandle;
 
 	/// @brief Ultralight DLL Handle.
-	void *UltralightHandle;
+	void* UltralightHandle;
 
 	/// @brief WebCore DLL Handle.
-	void *WebCoreHandle;
+	void* WebCoreHandle;
 };

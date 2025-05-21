@@ -20,23 +20,18 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
+#pragma once
 
-#if defined _WIN32 || defined _WIN64
+#include "CoreMinimal.h"
+
+
+#if defined(_WIN32) || defined(_WIN64)
 #define ULTRALIGHTUE_IMPORT __declspec(dllimport)
-#elif defined __linux__
+#define ULTRALIGHTUE_EXPORT __declspec(dllexport)
+#elif defined(__linux__)
 #define ULTRALIGHTUE_IMPORT __attribute__((visibility("default")))
+#define ULTRALIGHTUE_EXPORT __attribute__((visibility("default")))
 #else
 #define ULTRALIGHTUE_IMPORT
-#endif
-
-#if defined _WIN32 || defined _WIN64
-#include <Windows.h>
-
-#define ULTRALIGHTUE_EXPORT __declspec(dllexport)
-#else
-#include <stdio.h>
-#endif
-
-#ifndef ULTRALIGHTUE_EXPORT
 #define ULTRALIGHTUE_EXPORT
 #endif

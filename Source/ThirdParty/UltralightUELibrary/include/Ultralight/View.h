@@ -1,10 +1,10 @@
-/******************************************************************************
- *  This file is a part of Ultralight, an ultra-portable web-browser engine.  *
- *                                                                            *
- *  See <https://ultralig.ht> for licensing and more.                         *
- *                                                                            *
- *  (C) 2023 Ultralight, Inc.                                                 *
- *****************************************************************************/
+/**************************************************************************************************
+ *  This file is a part of Ultralight, an ultra-portable web-browser engine.                      *
+ *                                                                                                *
+ *  See <https://ultralig.ht> for licensing and more.                                             *
+ *                                                                                                *
+ *  (C) 2025 Ultralight, Inc.                                                                     *
+ **************************************************************************************************/
 #pragma once
 #include <Ultralight/Defines.h>
 #include <Ultralight/RefPtr.h>
@@ -26,11 +26,21 @@ namespace ultralight {
 /// @see Renderer::CreateView
 /// 
 struct UExport ViewConfig {
+  
+  ///
+  /// A user-generated id for the display (monitor, TV, or screen) that this View will be shown on.
+  /// 
+  /// Animations are driven based on the physical refresh rate of the display. Multiple Views can
+  /// share the same display.
+  /// 
+  /// @note This is automatically managed for you when App::Create() is used.
+  /// 
+  /// @see Renderer::RefreshDisplay.
+  /// 
+  uint32_t display_id = 0;
+
   ///
   /// Whether to render using the GPU renderer (accelerated) or the CPU renderer (unaccelerated).
-  /// 
-  /// This option is only valid if you're managing the Renderer yourself (eg, you've previously
-  /// called Renderer::Create() instead of App::Create()).
   ///
   /// When true, the View will be rendered to an offscreen GPU texture using the GPU driver set in
   /// Platform::set_gpu_driver. You can fetch details for the texture via View::render_target.
@@ -38,8 +48,20 @@ struct UExport ViewConfig {
   /// When false (the default), the View will be rendered to an offscreen pixel buffer using the
   /// multithreaded CPU renderer. This pixel buffer can optionally be provided by the user--
   /// for more info see Platform::set_surface_factory and View::surface.
+  /// 
+  /// @note This is automatically managed for you when App::Create() is used.
   ///
   bool is_accelerated = false;
+
+  ///
+  /// The initial device scale, ie. the amount to scale page units to screen pixels. This should
+  /// be set to the scaling factor of the device that the View is displayed on.
+  ///
+  /// @note 1.0 is equal to 100% zoom (no scaling), 2.0 is equal to 200% zoom (2x scaling)
+  ///
+  /// @note This is automatically managed for you when App::Create() is used.
+  ///
+  double initial_device_scale = 1.0;
 
   ///
   /// Whether or not this View should support transparency.
@@ -49,14 +71,6 @@ struct UExport ViewConfig {
   ///    html, body { background: transparent; }
   ///
   bool is_transparent = false;
-
-  ///
-  /// The initial device scale, ie. the amount to scale page units to screen pixels. This should
-  /// be set to the scaling factor of the device that the View is displayed on.
-  ///
-  /// @note 1.0 is equal to 100% zoom (no scaling), 2.0 is equal to 200% zoom (2x scaling)
-  ///
-  double initial_device_scale = 1.0;
 
   ///
   /// Whether or not the View should initially have input focus, @see View::Focus()
@@ -72,6 +86,11 @@ struct UExport ViewConfig {
   /// Whether or not JavaScript should be enabled.
   ///
   bool enable_javascript = true;
+  
+  ///
+  /// Whether or not compositing should be enabled.
+  /// 
+  bool enable_compositor = false;
 
   ///
   /// Default font-family to use.
@@ -94,22 +113,91 @@ struct UExport ViewConfig {
   String font_family_sans_serif = "Arial";
 
   ///
-  /// Default user-agent string.
+  /// Custom user-agent string. You can use this to override the default user-agent string.
+  /// 
+  /// @pre This feature is only available in Ultralight Pro edition and above.
   ///
-  String user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                      "AppleWebKit/610.4.3.1.4 (KHTML, like Gecko) "
-                      "Ultralight/1.3.0 Version/14.0.3 Safari/610.4.3.1.4";
+  String user_agent = ULTRALIGHT_USER_AGENT;
 };
 
 ///
-/// Web-page container rendered to an offscreen surface that you display yourself.
+/// Web-page container rendered to an offscreen surface.
 /// 
 /// The View class is responsible for loading and rendering web-pages to an offscreen surface. It
 /// is completely isolated from the OS windowing system, you must forward all input events to it
 /// from your application.
 ///
-/// @note  The API is not thread-safe, all calls must be made on the same thread that the
-///        Renderer/App was created on.
+/// ## Creating a View
+///
+/// You can create a View using Renderer::CreateView.
+///
+/// ```
+///  // Create a ViewConfig with the desired settings
+///  ViewConfig view_config;
+///  
+///  // Create a View, 500 by 500 pixels in size, using the default Session
+///  RefPtr<View> view = renderer->CreateView(500, 500, view_config, nullptr);
+/// ```
+///
+/// @note When using App::Create, the library will automatically create a View for you when you
+///       call Overlay::Create.
+///
+/// ## Loading Content into a View
+///
+/// You can load content asynchronously into a View using View::LoadURL().
+///
+/// ```
+///  // Load a URL into the View
+///  view->LoadURL("https://en.wikipedia.org/wiki/Main_Page");
+/// ```
+///
+/// ### Local File URLs
+///
+/// Local file URLs (eg, `file:///page.html`) will be loaded via FileSystem. You can provide your
+/// own FileSystem implementation so these files can be loaded from your application's resources.
+///
+/// ### Displaying Views in Your Application
+///
+/// Views are rendered either to a pixel-buffer (View::surface) or a GPU texture
+/// (View::render_target) depending on whether CPU or GPU rendering is used (see
+/// ViewConfig::is_accelerated).
+///
+/// You can use the Surface or RenderTarget to display the View in your application.
+///
+/// ```
+///  // Get the Surface for the View (assuming CPU rendering)
+///  Surface* surface = view->surface();
+///
+///  // Check if the Surface is dirty (pixels have changed)
+///  if (!surface->dirty_bounds().IsEmpty()) {
+///    // Cast to the default Surface implementation (BitmapSurface) and get
+///    // the underlying Bitmap.
+///    RefPtr<Bitmap> bitmap = static_cast<BitmapSurface*>(surface)->bitmap();
+///
+///    // Use the bitmap pixels here...
+///
+///    // Clear the dirty bounds after you're done displaying the pixels
+///    surface->ClearDirtyBounds();
+///  }
+/// ```
+///
+/// ## Input Events
+///
+/// You must forward all input events to the View from your application. This includes keyboard,
+/// mouse, and scroll events.
+///
+/// ```
+///  // Forward a mouse-move event to the View
+///  MouseEvent evt;
+///  evt.type = MouseEvent::kType_MouseMoved;
+///  evt.x = 100;
+///  evt.y = 100;
+///  evt.button = MouseEvent::kButton_None;
+///  view->FireMouseEvent(evt);
+/// ```
+///
+/// @note  The View API is not thread-safe, all calls must be made on the same thread that the
+///        Renderer or App was created on.
 ///
 class UExport View : public RefCounted {
  public:
@@ -132,6 +220,20 @@ class UExport View : public RefCounted {
   /// Get the height of the View, in pixels.
   ///
   virtual uint32_t height() const = 0;
+
+  ///
+  /// Get the display id of the View.
+  /// 
+  /// @see ViewConfig::display_id
+  /// 
+  virtual uint32_t display_id() const = 0;
+
+  ///
+  /// Set the display id of the View.
+  /// 
+  /// This should be called when the View is moved to another display.
+  /// 
+  virtual void set_display_id(uint32_t id) = 0;
 
   ///
   /// Get the device scale, ie. the amount to scale page units to screen pixels.
@@ -361,6 +463,35 @@ class UExport View : public RefCounted {
   /// Get the active LoadListener, if any
   ///
   virtual LoadListener* load_listener() const = 0;
+
+  ///
+  /// Set a DownloadListener to receive callbacks for download-related events.
+  ///
+  /// @note  Ownership remains with the caller.
+  ///
+  virtual void set_download_listener(DownloadListener* listener) = 0;
+
+  ///
+  /// Get the active DownloadListener, if any
+  ///
+  virtual DownloadListener* download_listener() const = 0;
+
+  ///
+  /// Cancel an active download.
+  /// 
+  virtual void CancelDownload(DownloadId id) = 0;
+
+  ///
+  /// Set a NetworkListener to receive callbacks for network-related events.
+  ///
+  /// @note  Ownership remains with the caller.
+  ///
+  virtual void set_network_listener(NetworkListener* listener) = 0;
+
+  ///
+  /// Get the active NetworkListener, if any
+  ///
+  virtual NetworkListener* network_listener() const = 0;
 
   ///
   /// Set whether or not this View should be repainted during the next call to Renderer::Render

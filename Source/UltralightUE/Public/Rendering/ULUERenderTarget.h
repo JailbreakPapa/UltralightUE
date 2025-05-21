@@ -22,8 +22,3 @@
  */
 
 #pragma once
-
-namespace ultralightue
-{
-
-}

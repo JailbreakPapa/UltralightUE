@@ -22,52 +22,42 @@
  */
 
 #pragma once
-#include <Ultralight/platform/FileSystem.h>
-#include <UltralightUELibrary/ULUEDefines.h>
+
 #include "CoreMinimal.h"
+#include "Ultralight/platform/FileSystem.h"
 
-namespace ultralightue
+
+enum class ULTRALIGHTUE_API FSAccess : uint8_t
 {
-    enum class ULTRALIGHTUE_EXPORT FSAccess : uint8_t
-    {
-        FSA_Native = 0x0001,  /// Native UE FileSystem, should be used with editor modules.
-        FSA_Package = 0x0002, /// Package FileSystem, should be used at runtime.
-    };
+	FSA_Native = 0x0001, /// Native UE FileSystem, should be used with editor modules.
+	FSA_Package = 0x0002, /// Package FileSystem, should be used at runtime.
+};
 
-    /// @brief Unreal Engine implementation of Ultralight's FileSystem.
-    /*
-     * NOTE: This is a internal class. you should not really be using this, unless you have a special filesystem to set.
-     * HOW TO USE: SetFSAccess if you are using the native file system, or reading through package files, then provide to ULUEHandler.
-     */
-    class ULTRALIGHTUE_EXPORT ULUEFileSystem : public ultralight::FileSystem
-    {
-    public:
-        void SetFSAccess(ultralightue::FSAccess &in_accesspattern);
-        ULUEFileSystem();
+/// @brief Unreal Engine implementation of Ultralight's FileSystem.
+/*
+ * NOTE: This is a internal class. you should not really be using this, unless you have a special filesystem to set.
+ * HOW TO USE: SetFSAccess if you are using the native file system, or reading through package files, then provide to ULUEHandler.
+ */
+class ULTRALIGHTUE_API UEFileSystem : public ultralight::FileSystem
+{
+public:
+	UEFileSystem(const FString& baseDir);
+	virtual ~UEFileSystem() override;
+	void RegisterVirtualFile(const FString& virtualPath, const TArray<uint8>& data);
+	static void RegisterFile(const FString& VirtualPath, const TArray<uint8>& Data);
+	virtual bool FileExists(const ultralight::String& file_path) override;
+	virtual ultralight::String GetFileMimeType(const ultralight::String& file_path) override;
+	virtual ultralight::String GetFileCharset(const ultralight::String& file_path) override;
+	virtual ultralight::RefPtr<ultralight::Buffer> OpenFile(const ultralight::String& file_path) override;
 
-        virtual ~UEFileSystem() override {}
+private:
+	FString BaseDir;
 
-        virtual bool FileExists(const ultralight::String &path) override;
-        virtual bool GetFileSize(ultralight::FileHandle handle, int64_t &result) override;
+	// Helper to convert Ultralight String to Unreal FString
+	FString ToFString(const ultralight::String& ulString) const;
 
-        virtual ultralight::FileHandle OpenFile(const ultralight::String &path, bool open_for_writing) override;
+	// Helper to get full file path
+	FString GetFullPath(const ultralight::String& file_path) const;
 
-        virtual void CloseFile(ultralight::FileHandle &handle) override;
-
-        virtual bool ReadFromFile(ultralight::FileHandle handle, char *data, int64_t length) override;
-
-        virtual bool GetFileMimeType(const ultralight::String &path, ultralight::String &result) override;
-
-        virtual bool GetFileCharset(const ultralight::String &path, ultralight::String &result) override;
-
-        virtual bool GetFileCreationTime(const ultralight::String &path, int64_t &result) override;
-
-        virtual bool GetFileLastModificationTime(const ultralight::String &path, int64_t &result) override;
-
-    private:
-        FString MapPath(const ultralight::String &path);
-    private:
-        FString BaseDirectory;
-        ultralightue::FSAccess m_access = FSAccess::FSA_Native;
-    };
-}
+	static TMap<FString, TArray<uint8>> VirtualFiles;
+};

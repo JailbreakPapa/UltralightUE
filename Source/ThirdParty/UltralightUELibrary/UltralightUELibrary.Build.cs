@@ -26,103 +26,107 @@ using UnrealBuildTool;
 
 public class UltralightUELibrary : ModuleRules
 {
-    /// NOTE: If you do have access, feel free to add console/NDA based platforms here as well. you can also contact: contact@wdstudios.tech for access as well.
-    // Credit for these two functions, that were added by a very nice UEForms user: https://forums.unrealengine.com/t/how-to-modify-build-file-to-copy-dlls-to-binaries/353587
+	public UltralightUELibrary(ReadOnlyTargetRules Target) : base(Target)
+	{
+		Type = ModuleType.External;
 
-    public string GetUProjectPath()
-    {
-        return Directory.GetParent(ModuleDirectory).Parent.Parent.ToString();
-    }
+		PublicIncludePaths.Add("$(PluginDir)/Source/ThirdParty/UltralightUELibrary/include");
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			// Add the import library
+			PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Win64", "WebCore.lib"));
+			PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Win64", "UltralightCore.lib"));
+			PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Win64", "Ultralight.lib"));
+			// Delay-load the DLL(s), so we can load it from the right place first
+			PublicDelayLoadDLLs.Add("$(PluginDir)/Binaries/Win64/WebCore.dll");
+			PublicDelayLoadDLLs.Add("$(PluginDir)/Binaries/Win64/Ultralight.dll");
+			PublicDelayLoadDLLs.Add("$(PluginDir)/Binaries/Win64/UltralightCore.dll");
+			// Ensure that the DLL(s) is staged along with the executable
+			RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/UltralightUELibrary/Win64/WebCore.dll");
+			RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/UltralightUELibrary/Win64/UltralightCore.dll");
+			RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/UltralightUELibrary/Win64/Ultralight.dll");
 
-    private void CopyToBinaries(string Filepath, ReadOnlyTargetRules Target)
-    {
-        string binariesDir = "";
-        string filename = "";
+			/// Copy Dll(s) over to binary directory, so the engine can actually load them.
+			CopyToBinaries(ModuleDirectory + "/Win64/WebCore.dll", Target);
+			CopyToBinaries(ModuleDirectory + "/Win64/UltralightCore.dll", Target);
+			CopyToBinaries(ModuleDirectory + "/Win64/Ultralight.dll", Target);
+		}
+		else if (Target.Platform == UnrealTargetPlatform.Mac)
+		{
+			PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Mac", "Release", "libUltralight.dylib"));
+			PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Mac", "Release", "libUltralightCore.dylib"));
+			PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Mac", "Release", "libWebCore.dylib"));
+			RuntimeDependencies.Add(
+				"$(PluginDir)/Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralight.dylib");
+			RuntimeDependencies.Add(
+				"$(PluginDir)/Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralightCore.dylib");
+			RuntimeDependencies.Add("$(PluginDir)/Source/ThirdParty/UltralightUELibrary/Mac/Release/libWebCore.dylib");
 
-        if (Target.Platform == UnrealTargetPlatform.Win64)
-        {
-            binariesDir = Path.Combine(GetUProjectPath(), "Binaries", "Win64");
-            filename = Path.GetFileName(Filepath);
-        }
+			/// Copy Dll(s) over to binary directory, so the engine can actually load them.
+			CopyToBinaries(ModuleDirectory + "/Mac/Release/WebCore.dylib", Target);
+			CopyToBinaries(ModuleDirectory + "/Mac/Release/UltralightCore.dylib", Target);
+			CopyToBinaries(ModuleDirectory + "/Mac/Release/Ultralight.dylib", Target);
+		}
+		else if (Target.Platform == UnrealTargetPlatform.Linux)
+		{
+			string SoWebCorePath = Path.Combine("$(PluginDir)", "Binaries", "ThirdParty", "UltralightUELibrary",
+				"Linux", "x86_64-unknown-linux-gnu", "libWebCore.so");
+			string SoULCorePath = Path.Combine("$(PluginDir)", "Binaries", "ThirdParty", "UltralightUELibrary", "Linux",
+				"x86_64-unknown-linux-gnu", "libUltralightCore.so");
+			string SoULPath = Path.Combine("$(PluginDir)", "Binaries", "ThirdParty", "UltralightUELibrary", "Linux",
+				"x86_64-unknown-linux-gnu", "libUltralight.so");
+			PublicAdditionalLibraries.Add(SoWebCorePath);
+			PublicAdditionalLibraries.Add(SoULCorePath);
+			PublicAdditionalLibraries.Add(SoULPath);
+			PublicDelayLoadDLLs.Add(SoWebCorePath);
+			PublicDelayLoadDLLs.Add(SoULCorePath);
+			PublicDelayLoadDLLs.Add(SoULPath);
+			RuntimeDependencies.Add(SoWebCorePath);
+			RuntimeDependencies.Add(SoULCorePath);
+			RuntimeDependencies.Add(SoULPath);
 
-        if (Target.Platform == UnrealTargetPlatform.Mac)
-        {
-            binariesDir = Path.Combine(GetUProjectPath(), "Mac", "Release");
-            filename = Path.GetFileName(Filepath);
-        }
+			/// Copy Dll(s) over to binary directory, so the engine can actually load them.
+			/// NOTE: Directory is assumed here. will have to test more on linux.
+			CopyToBinaries(ModuleDirectory + "/Linux/x86_64-unknown-linux-gnu/libWebCore.so", Target);
+			CopyToBinaries(ModuleDirectory + "/Linux/x86_64-unknown-linux-gnu/libUltralightCore.so", Target);
+			CopyToBinaries(ModuleDirectory + "/Linux/x86_64-unknown-linux-gnu/Ultralight.so", Target);
+		}
+	}
 
-        if (Target.Platform == UnrealTargetPlatform.Linux)
-        {
-            binariesDir = Path.Combine(GetUProjectPath(), "Linux", "x86_64-unknown-linux-gnu");
-            filename = Path.GetFileName(Filepath);
-        }
+	/// NOTE: If you do have access, feel free to add console/NDA-based platforms here as well.
+	// Credit for these two functions that were added by a very nice UEForms user: https://forums.unrealengine.com/t/how-to-modify-build-file-to-copy-dlls-to-binaries/353587
+	public string GetUProjectPath()
+	{
+		return Directory.GetParent(ModuleDirectory).Parent.Parent.ToString();
+	}
 
-        if (!Directory.Exists(binariesDir))
-            Directory.CreateDirectory(binariesDir);
+	private void CopyToBinaries(string Filepath, ReadOnlyTargetRules Target)
+	{
+		var binariesDir = "";
+		var filename = "";
 
-        if (!File.Exists(Path.Combine(binariesDir, filename)))
-            File.Copy(Filepath, Path.Combine(binariesDir, filename), true);
-    }
-    public UltralightUELibrary(ReadOnlyTargetRules Target) : base(Target)
-    {
-        Type = ModuleType.External;
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+			binariesDir = Path.Combine(GetUProjectPath(), "Binaries", "Win64");
+			filename = Path.GetFileName(Filepath);
+		}
 
-        PublicIncludePaths.Add("$(PluginDir)/Source/ThirdParty/UltralightUELibrary/include");
+		if (Target.Platform == UnrealTargetPlatform.Mac)
+		{
+			binariesDir = Path.Combine(GetUProjectPath(), "Mac", "Release");
+			filename = Path.GetFileName(Filepath);
+		}
 
-        if (Target.Platform == UnrealTargetPlatform.Win64)
-        {
-            // Add the import library
-            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Win64", "WebCore.lib"));
-            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Win64", "UltralightCore.lib"));
-            PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Win64", "Ultralight.lib"));
-            // Delay-load the DLL(s), so we can load it from the right place first
-            PublicDelayLoadDLLs.Add("$(PluginDir)/Binaries/Win64/WebCore.dll");
-            PublicDelayLoadDLLs.Add("$(PluginDir)/Binaries/Win64/Ultralight.dll");
-            PublicDelayLoadDLLs.Add("$(PluginDir)/Binaries/Win64/UltralightCore.dll");
-            // Ensure that the DLL(s) is staged along with the executable
-            RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/UltralightUELibrary/Win64/WebCore.dll");
-            RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/UltralightUELibrary/Win64/UltralightCore.dll");
-            RuntimeDependencies.Add("$(PluginDir)/Binaries/ThirdParty/UltralightUELibrary/Win64/Ultralight.dll");
+		if (Target.Platform == UnrealTargetPlatform.Linux)
+		{
+			binariesDir = Path.Combine(GetUProjectPath(), "Linux", "x86_64-unknown-linux-gnu");
+			filename = Path.GetFileName(Filepath);
+		}
 
-            /// Copy Dll(s) over to binary directory, so the engine can actually load them.
-            CopyToBinaries(ModuleDirectory + "/Win64/WebCore.dll", Target);
-            CopyToBinaries(ModuleDirectory + "/Win64/UltralightCore.dll", Target);
-            CopyToBinaries(ModuleDirectory + "/Win64/Ultralight.dll", Target);
-        }
-        else if (Target.Platform == UnrealTargetPlatform.Mac)
-        {
-            PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Mac", "Release", "libUltralight.dylib"));
-            PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Mac", "Release", "libUltralightCore.dylib"));
-            PublicDelayLoadDLLs.Add(Path.Combine(ModuleDirectory, "Mac", "Release", "libWebCore.dylib"));
-            RuntimeDependencies.Add("$(PluginDir)/Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralight.dylib");
-            RuntimeDependencies.Add("$(PluginDir)/Source/ThirdParty/UltralightUELibrary/Mac/Release/libUltralightCore.dylib");
-            RuntimeDependencies.Add("$(PluginDir)/Source/ThirdParty/UltralightUELibrary/Mac/Release/libWebCore.dylib");
+		if (!Directory.Exists(binariesDir))
+			Directory.CreateDirectory(binariesDir);
 
-            /// Copy Dll(s) over to binary directory, so the engine can actually load them.
-            CopyToBinaries(ModuleDirectory + "/Mac/Release/WebCore.dylib", Target);
-            CopyToBinaries(ModuleDirectory + "/Mac/Release/UltralightCore.dylib", Target);
-            CopyToBinaries(ModuleDirectory + "/Mac/Release/Ultralight.dylib", Target);
-        }
-        else if (Target.Platform == UnrealTargetPlatform.Linux)
-        {
-            string SoWebCorePath = Path.Combine("$(PluginDir)", "Binaries", "ThirdParty", "UltralightUELibrary", "Linux", "x86_64-unknown-linux-gnu", "libWebCore.so");
-            string SoULCorePath = Path.Combine("$(PluginDir)", "Binaries", "ThirdParty", "UltralightUELibrary", "Linux", "x86_64-unknown-linux-gnu", "libUltralightCore.so");
-            string SoULPath = Path.Combine("$(PluginDir)", "Binaries", "ThirdParty", "UltralightUELibrary", "Linux", "x86_64-unknown-linux-gnu", "libUltralight.so");
-            PublicAdditionalLibraries.Add(SoWebCorePath);
-            PublicAdditionalLibraries.Add(SoULCorePath);
-            PublicAdditionalLibraries.Add(SoULPath);
-            PublicDelayLoadDLLs.Add(SoWebCorePath);
-            PublicDelayLoadDLLs.Add(SoULCorePath);
-            PublicDelayLoadDLLs.Add(SoULPath);
-            RuntimeDependencies.Add(SoWebCorePath);
-            RuntimeDependencies.Add(SoULCorePath);
-            RuntimeDependencies.Add(SoULPath);
-
-            /// Copy Dll(s) over to binary directory, so the engine can actually load them.
-            /// NOTE: Directory is assumed here. will have to test more on linux.
-            CopyToBinaries(ModuleDirectory + "/Linux/x86_64-unknown-linux-gnu/libWebCore.so", Target);
-            CopyToBinaries(ModuleDirectory + "/Linux/x86_64-unknown-linux-gnu/libUltralightCore.so", Target);
-            CopyToBinaries(ModuleDirectory + "/Linux/x86_64-unknown-linux-gnu/Ultralight.so", Target);
-        }
-    }
+		if (!File.Exists(Path.Combine(binariesDir, filename)))
+			File.Copy(Filepath, Path.Combine(binariesDir, filename), true);
+	}
 }

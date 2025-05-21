@@ -23,18 +23,18 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include <Ultralight/platform/Logger.h>
 
-namespace ultralightue
-{
-    class ILogInterface : public utralight::Logger
-    {
-    public:
-        virtual ~ILogInterface() = default;
+DECLARE_LOG_CATEGORY_EXTERN(LogUltralightUE, Log, All);
 
-        /// @brief Logs a error within the developer defined interface.
-        /// @param log_level The level of the log message.
-        /// @param message What the error message will contain.
-        virtual void LogMessage(ultralight::LogLevel log_level, const ultralight::String &message) = 0;
-    };
-}
+class ILogInterface : public ultralight::Logger
+{
+public:
+	virtual ~ILogInterface() override = default;
+
+	/// @brief Logs a error within the developer defined interface.
+	/// @param log_level The level of the log message.
+	/// @param message What the error message will contain.
+	virtual void LogMessage(ultralight::LogLevel log_level, const ultralight::String& message) override;
+};

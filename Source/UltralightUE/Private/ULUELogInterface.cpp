@@ -20,36 +20,49 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-#include "UltralightUE/Public/ULUELogInterface.h"
-#include "Internal/ULUEILoggerInterface.h"
 
+#include "ULUELogInterface.h"
+#include "Internal/ULUEILoggerInterface.h"
 #include "Containers/UnrealString.h"
 #include "Logging/LogMacros.h"
-#include "ULUELogInterface.h"
 
-ultralightue::ULUELogInterface::ULUELogInterface()
+
+class ULUELogInterface::Pimpl
 {
-	if(LoggerInterface == nullptr)
+public:
+	TUniquePtr<ILogInterface> LoggerInterface;
+};
+
+ULUELogInterface::ULUELogInterface()
+{
+	if (pimpl->LoggerInterface == nullptr)
 	{
-		LoggerInterface = new ULUEILoggerInterface();
+		pimpl->LoggerInterface = MakeUnique<ILogInterface>();
 	}
 	else
 	{
-		LoggerInterface = nullptr;
+		pimpl->LoggerInterface = nullptr;
 	}
 }
 
-void ultralightue::ULUELogInterface::LogError(FString details)
+ULUELogInterface::~ULUELogInterface()
 {
-
 }
 
-void ultralightue::ULUELogInterface::LogWarning(FString details)
+void ULUELogInterface::LogError(FString details)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UltralightUE Warning: %s"), *details);
+	pimpl->LoggerInterface->LogMessage(ultralight::LogLevel::Error,
+	                                   reinterpret_cast<const char*>(details.GetCharArray().GetData()));
 }
 
-void ultralightue::ULUELogInterface::LogInfo(FString details)
+void ULUELogInterface::LogWarning(FString details)
 {
-	UE_LOG(LogTemp, Log, TEXT("UltralightUE: %s"), *details);
+	pimpl->LoggerInterface->LogMessage(ultralight::LogLevel::Warning,
+	                                   reinterpret_cast<const char*>(details.GetCharArray().GetData()));
+}
+
+void ULUELogInterface::LogInfo(FString details)
+{
+	pimpl->LoggerInterface->LogMessage(ultralight::LogLevel::Info,
+	                                   reinterpret_cast<const char*>(details.GetCharArray().GetData()));
 }
