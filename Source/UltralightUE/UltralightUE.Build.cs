@@ -67,6 +67,7 @@ public class UltralightUE : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
+				"UltralightUEEditor"
 				// Add private dependencies if needed
 			}
 		);

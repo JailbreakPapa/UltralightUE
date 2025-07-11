@@ -2,31 +2,20 @@
 #include <Ultralight/platform/Config.h>
 #include <Ultralight/Ultralight.h>
 
+#include "UltralightUE.h"
 
-class ULUERenderManagerCPU::Pimpl
-{
-public:
-	ultralight::RefPtr<class ultralight::Renderer> Renderer;
-};
 
 ULUERenderManagerCPU::ULUERenderManagerCPU()
 {
-	ultralight::Config Config;
-	m_pimpl = new Pimpl();
-	// Configure as needed, e.g., resource paths
-	m_pimpl->Renderer = ultralight::Renderer::Create();
 }
 
 ULUERenderManagerCPU::~ULUERenderManagerCPU()
 {
-	m_pimpl->Renderer->Release();
-	m_pimpl->Renderer.reset();
-	m_pimpl = nullptr;
 }
 
 ultralight::View* ULUERenderManagerCPU::CreateView(int32 Width, int32 Height, bool bTransparent)
 {
-	return m_pimpl->Renderer->CreateView(Width, Height, ultralight::ViewConfig(false, bTransparent), nullptr).get();
+	return FUltralightUEModule::Get().GetRenderer()->CreateView(Width, Height, ultralight::ViewConfig(false,false,1.0,bTransparent), nullptr).get();
 }
 
 void ULUERenderManagerCPU::RegisterViewTexture(ultralight::View* View, UTexture2D* Texture)
@@ -41,11 +30,11 @@ void ULUERenderManagerCPU::UnregisterView(ultralight::View* View)
 
 void ULUERenderManagerCPU::Tick(float DeltaTime)
 {
-	if (m_pimpl->Renderer)
+	if (FUltralightUEModule::Get().GetRenderer())
 	{
 		// Update logic and render all views
-		m_pimpl->Renderer->Update();
-		m_pimpl->Renderer->Render();
+		FUltralightUEModule::Get().GetRenderer()->Update();
+		FUltralightUEModule::Get().GetRenderer()->Render();
 
 		// Update each registered texture
 		for (auto& Pair : ViewTextureMap)

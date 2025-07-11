@@ -24,8 +24,10 @@
 #pragma once
 #include "IPlatformFilePak.h"
 #include "Modules/ModuleManager.h"
+#include "Ultralight/Renderer.h"
 
 
+class ULUEPlatformManager;
 class ULUEFontSystem;
 class FPakFile;
 class ULUELogInterface;
@@ -34,9 +36,15 @@ class ULUERenderManagerCPU;
 class ULUERenderManagerGPU;
 class ULUEInstance;
 
+namespace ultralight
+{
+	class Renderer;
+}
 
 class FUltralightUEModule : public IModuleInterface
 {
+	friend ULUEPlatformManager;
+	class Pimpl;
 public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
@@ -65,7 +73,9 @@ public:
 	/// @brief Starts setting up Ultralight. this will require all requested dll(s), and interfaces to be ready.
 	/// @return if the startup was successful.
 	bool StartupUltralight();
-
+	/// @brief Sets up the Renderer Singleton.
+	/// @warning Make sure this is called once all interfaces are set to the platform singleton.
+	void SetupRenderer();
 	/// @brief Loads Ultralight Resources Needed for Runtime. (through package files)
 	/// This will require the resource package containing the .dat, and the certification file that was included with the plugin.
 	/// NOTE: Developers who choose to package ultralight assets with pak(s), will have to handle packaging those assets. make sure there is a "/uiresources" entry!
@@ -83,7 +93,7 @@ public:
 	
 	/**
 	 * @brief Sets the filesystem to a new ref.
-	 * @warning DONT change when the engine is running; otherwise, a crash will occur.
+	 * @warning DON'T change when the engine is running; otherwise, a crash will occur.
 	 * @param in_filesystem the file system you want to set it to.
 	 */
 	void SetFileSystem(UEFileSystem& in_filesystem);
@@ -95,7 +105,10 @@ public:
 	/// @brief Get the file system interface.
 	/// @return Returns the file system interface.
 	UEFileSystem* GetFileSystem() const;
-
+	/// @brief Get the underlying renderer for Ultralight.
+	/// @return the renderer.
+	ultralight::Renderer* GetRenderer() const;
+	
 	/// @brief Web Core Library Path.
 	FString WebCoreLibraryPath;
 	/// @brief Ultralight Core Library Path.
@@ -107,9 +120,10 @@ private:
 	/// @brief Destroys the Ultralight DLL handles. This should ONLY be called at shutdown.
 	void DestroyUltralightHandles();
 
-	TSharedPtr<class ULUELogInterface> m_loginterface;
-	TSharedPtr<class UEFileSystem> m_filesystem;
-	TSharedPtr<class ULUEFontSystem> m_fontsystem;
+	TSharedPtr<ULUELogInterface> m_loginterface;
+	TSharedPtr<UEFileSystem> m_filesystem;
+	TSharedPtr<ULUEFontSystem> m_fontsystem;
+	Pimpl* m_pimpl;
 	/// Handles to Ultralight DLL(s).
 
 	/// @brief Ultralight Core DLL Handle.

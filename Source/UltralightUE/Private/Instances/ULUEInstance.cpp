@@ -4,17 +4,32 @@
 #include "Engine/GameInstance.h"
 #include "Misc/Paths.h"
 #include "Tickable.h"
+#include "UltralightUESettings.h"
+#include "FileSystem/ULUEFileSystem.h"
+#include "FontSystem/ULUEFontSystem.h"
 
 
 ULUEInstance::ULUEInstance()
 {
 	RenderManager = nullptr;
+	FileSystem = nullptr;
+	FontLoader = nullptr;
+	
 }
 
 void ULUEInstance::Initialize(FSubsystemCollectionBase& Collection)
 {
 	Super::Initialize(Collection);
-
+	// Load settings from UltralightUE.ini
+	const UUltralightUESettings* Settings = GetDefault<UUltralightUESettings>();
+	FString BaseDir = FPaths::Combine(FPaths::ProjectContentDir(), Settings->ResourcesPath);
+	if (!BaseDir.EndsWith(TEXT("/")))
+	{
+		BaseDir += TEXT("/");
+	}
+	// Setup Platform Instance
+	PlatformManager = MakeShared<ULUEPlatformManager>(Fonts);
+	PlatformManager->Initialize();
 	RenderManager = NewObject<ULUERenderManagerCPU>(this);
 	if (!RenderManager)
 	{
@@ -54,6 +69,18 @@ void ULUEInstance::Deinitialize()
 		RenderManager = nullptr;
 	}
 
+	if (FileSystem)
+	{
+		delete FileSystem;
+		FileSystem = nullptr;
+	}
+
+	if (FontLoader)
+	{
+		delete FontLoader;
+		FontLoader = nullptr;
+	}
+
 	Super::Deinitialize();
 }
 
@@ -65,8 +92,6 @@ ULUERenderManagerCPU* ULUEInstance::GetRenderManager() const
 void ULUEInstance::OnWorldTick(UWorld* World, ELevelTick TickType, float DeltaTime)
 {
 	if (RenderManager && TickType
-
-
 		==
 		LEVELTICK_All
 	)

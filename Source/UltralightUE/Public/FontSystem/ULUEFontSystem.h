@@ -27,9 +27,8 @@
 #include <Ultralight/platform/FontLoader.h>
 #include "Assets/ULUEFontAsset.h"
 
-class UULUEFontAsset;
 
-class ULTRALIGHTUE_API ULUEFontSystem : public ultralight::FontLoader
+class ULUEFontSystem : public ultralight::FontLoader
 {
 public:
 	ULUEFontSystem(const TArray<UULUEFontAsset*>& InFonts, const FString& InFallbackFontFamily)

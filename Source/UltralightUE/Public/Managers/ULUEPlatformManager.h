@@ -25,22 +25,23 @@
 
 namespace ultralight
 {
-	class Config;
+	struct Config;
 }
 
+class UULUEFontAsset;
 
 // RESTRICTED CLASS. DO NOT INCLUDE OUTSIDE OF MODULE.
 class ULUEPlatformManager
 {
 public:
-	ULUEPlatformManager();
+	explicit ULUEPlatformManager(TArray<UULUEFontAsset*>& in_Fonts);
 	virtual ~ULUEPlatformManager();
-
+	
 	void Initialize();
 	void Deinitialize();
 	ultralight::Config* GetConfig();
 
 private:
 	bool Status;
-	ultralight::Config m_Config;
+	TObjectPtr<ultralight::Config> m_Config;
 };

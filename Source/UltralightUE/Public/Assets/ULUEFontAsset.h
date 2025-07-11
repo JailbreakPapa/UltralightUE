@@ -49,9 +49,13 @@ public:
 	bool bIsItalic = false;
 
 	// Raw font data (TTF or OTF bytes)
-	UPROPERTY(Category = "Font")
+	UPROPERTY(BlueprintReadOnly,Category = "Font")
 	TArray<uint8> FontData;
 
+	// Supported Unicode ranges (e.g., for CJK characters)
+	UPROPERTY(EditAnywhere, Category = "Font")
+	TArray<FInt32Range> SupportedCodePointRanges;
+	
 	UPROPERTY(EditAnywhere, Category = "Font")
 	UFont* FontAsset;
 

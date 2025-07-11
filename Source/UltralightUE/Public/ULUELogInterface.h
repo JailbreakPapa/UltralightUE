@@ -26,6 +26,7 @@
 #include "CoreMinimal.h"
 #include "Templates/UniquePtr.h"
 
+class ILogInterface;
 
 /// @brief Simple class for developers to assign logging interfaces to the plugin.
 /// NOTE: By default, the plugin will log to the console like normal, using color codes like: red, yellow, and white.
@@ -50,6 +51,7 @@ public:
 	/// @param details What the info message will contain.            
 	virtual void LogInfo(FString details);
 
+	ILogInterface* GetInternalInterface() const;
 private:
 	Pimpl* pimpl;
 };

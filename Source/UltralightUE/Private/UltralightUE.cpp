@@ -27,11 +27,17 @@
 #include "Interfaces/IPluginManager.h"
 #include <ThirdParty/UltralightUELibrary/ULUELibrary.h>
 #include "FileSystem/ULUEFileSystem.h"
-#include "FontSystem/ULUEFontSystem.h"
 #include "Internal/ULUEILoggerInterface.h"
 #include "Runtime/PakFile/Public/IPlatformFilePak.h"
 
 #define LOCTEXT_NAMESPACE "FUltralightUEModule"
+
+class FUltralightUEModule::Pimpl
+{
+	public:
+	ultralight::RefPtr<ultralight::Renderer> Renderer;
+};
+
 
 void FUltralightUEModule::StartupModule()
 {
@@ -73,6 +79,8 @@ void FUltralightUEModule::StartupModule()
 		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("UltralightUE: Error",
 		                                              "Failed to load UltralightUE! Please check the log for any messages. if you cant fix the issue, create a issue on github! (https://github.com/JailbreakPapa/UltralightUE)"));
 	}
+	// Create the renderer pimpl
+	m_pimpl = MakeUnique<Pimpl>().Get();
 }
 
 void FUltralightUEModule::ShutdownModule()
@@ -82,6 +90,8 @@ void FUltralightUEModule::ShutdownModule()
 
 	// Free the dll handles to ultralight dll(s).
 	DestroyUltralightHandles();
+	// Free the renderer pimpl??? idk since its a singleton....
+	// TODO: 
 }
 
 bool FUltralightUEModule::StartupUltralight()
@@ -89,8 +99,12 @@ bool FUltralightUEModule::StartupUltralight()
 	m_loginterface = MakeShared<ULUELogInterface>();
 	// NOTE(Mikael A.): what ever pck contains the uiresources, should be accessible. this should be in the main content dir.
 	m_filesystem = MakeShared<UEFileSystem>("/uiresources");
-	m_fontsystem = MakeShared<ULUEFontSystem>();
 	return true;
+}
+
+void FUltralightUEModule::SetupRenderer()
+{
+	m_pimpl->Renderer = ultralight::Renderer::Create();
 }
 
 bool FUltralightUEModule::CheckUltralightResources(FPakFile& p_resourcepak)
@@ -142,6 +156,11 @@ ULUELogInterface* FUltralightUEModule::GetLogInterface() const
 UEFileSystem* FUltralightUEModule::GetFileSystem() const
 {
 	return m_filesystem.Get();
+}
+
+ultralight::Renderer* FUltralightUEModule::GetRenderer() const
+{
+	return m_pimpl->Renderer.get();
 }
 
 void FUltralightUEModule::DestroyUltralightHandles()

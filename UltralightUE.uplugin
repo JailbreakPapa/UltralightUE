@@ -18,7 +18,12 @@
 		{
 			"Name": "UltralightUE",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "EarliestPossible"
+		},
+		{
+			"Name": "UltralightUEEditor",
+			"Type": "Editor",
+			"LoadingPhase": "PostEngineInit"
 		}
 	]
 }

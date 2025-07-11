@@ -70,7 +70,11 @@ ultralight::String UEFileSystem::GetFileMimeType(const ultralight::String& file_
 	{
 		return ultralight::String("text/plain");
 	}
-
+	if (extension == TEXT("ttf") || extension == TEXT("otf"))
+	{
+		return "application/x-font-ttf";
+	}
+	
 	return ultralight::String("application/unknown");
 }
 

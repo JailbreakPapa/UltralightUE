@@ -1,8 +1,7 @@
 #include "Components/UltralightViewComponent.h"
-#include "UltralightUE/Public/ULUEInstance.h"
+#include "Instances/ULUEInstance.h"
 #include "Rendering/ULUERenderManagerCPU.h"
 #include "Engine/Texture2D.h"
-#include "GameFramework/GameModeBase.h"
 #include "Engine/World.h"
 #include <Ultralight/RefPtr.h>
 

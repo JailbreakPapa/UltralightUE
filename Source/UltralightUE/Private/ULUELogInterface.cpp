@@ -66,3 +66,8 @@ void ULUELogInterface::LogInfo(FString details)
 	pimpl->LoggerInterface->LogMessage(ultralight::LogLevel::Info,
 	                                   reinterpret_cast<const char*>(details.GetCharArray().GetData()));
 }
+
+ILogInterface* ULUELogInterface::GetInternalInterface() const
+{
+	return pimpl->LoggerInterface.Get();
+}
