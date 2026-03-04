@@ -23,18 +23,34 @@
 
 #pragma once
 
-#include <Ultralight/platform/Logger.h>
+#include "CoreMinimal.h"
+#include <Ultralight/platform/Clipboard.h>
 
 namespace ultralightue
 {
-    class ULUEILoggerInterface : public ultralight::Logger
-    {
-    public:
-        virtual ~ULUEILoggerInterface() = default;
+	/**
+	 * Unreal Engine implementation of Ultralight's Clipboard interface.
+	 *
+	 * Delegates to FPlatformApplicationMisc::ClipboardCopy / ClipboardPaste
+	 * for reading and writing the system clipboard.
+	 */
+	class ULTRALIGHTUE_API ULUEClipboard : public ultralight::Clipboard
+	{
+	public:
+		ULUEClipboard() = default;
+		virtual ~ULUEClipboard() override = default;
 
-        /// @brief Logs a error within the developer defined interface.
-        /// @param log_level The level of the log message.
-        /// @param message What the error message will contain.
-        virtual void LogMessage(ultralight::LogLevel log_level, const ultralight::String &message) = 0;
-    };
+		// -------------------------------------------------------------------
+		// ultralight::Clipboard interface
+		// -------------------------------------------------------------------
+
+		/** Clear the system clipboard. */
+		virtual void Clear() override;
+
+		/** Read plain-text from the system clipboard. */
+		virtual ultralight::String ReadPlainText() override;
+
+		/** Write plain-text to the system clipboard. */
+		virtual void WritePlainText(const ultralight::String& text) override;
+	};
 }

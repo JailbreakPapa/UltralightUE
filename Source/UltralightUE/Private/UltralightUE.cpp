@@ -26,6 +26,7 @@
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
+#include "ShaderCore.h"
 #include "ThirdParty/UltralightUELibrary/ULUELibrary.h" // Corrected include path
 
 
@@ -62,6 +63,10 @@ void FUltralightUEModule::StartupModule()
 	{
 		// Startup Ultralight engine.
 		ultralightue::NotifyUltralightUEStartup();
+
+		// Register shader directory for GPU rendering path
+		FString ShaderDir = FPaths::Combine(*BaseDir, TEXT("Shaders"));
+		AddShaderSourceDirectoryMapping(TEXT("/Plugin/UltralightUE"), ShaderDir);
 	}
 	else
 	{

@@ -8,10 +8,10 @@
  *   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *   copies of the Software, and to permit persons to whom the Software is
  *   furnished to do so, subject to the following conditions:
- 
+
  *   The above copyright notice and this permission notice shall be included in all
  *   copies or substantial portions of the Software.
- 
+
  *   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,9 +28,8 @@ public class UltralightUE : ModuleRules
     public UltralightUE(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
-        PrivatePCHHeaderFile = "Private/UltralightUEPCH.h"; // Added this line
+        PrivatePCHHeaderFile = "Private/UltralightUEPCH.h";
 
-        // It's good practice to define PublicIncludePaths before PrivateIncludePaths
         PublicIncludePaths.AddRange(
             new string[] {
                 System.IO.Path.Combine(ModuleDirectory, "Public")
@@ -57,23 +56,22 @@ public class UltralightUE : ModuleRules
                 "SlateCore",
                 "UltralightUELibrary",
                 "PakFile",
-                "RSA"
-				// ... add other public dependencies that you statically link with here ...
-			}
-            );
+                "RSA",
+                "UMG"
+            }
+        );
 
         PrivateDependencyModuleNames.AddRange(
             new string[]
             {
-				// ... add private dependencies that you statically link with here ...
-			}
-            );
+                "ApplicationCore"
+            }
+        );
 
         DynamicallyLoadedModuleNames.AddRange(
             new string[]
             {
-				// ... add any modules that your module loads dynamically here ...
-			}
-            );
+            }
+        );
     }
 }

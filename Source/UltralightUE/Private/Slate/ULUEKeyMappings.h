@@ -23,18 +23,27 @@
 
 #pragma once
 
-#include <Ultralight/platform/Logger.h>
+#include "CoreMinimal.h"
+#include "InputCoreTypes.h"
 
 namespace ultralightue
 {
-    class ULUEILoggerInterface : public ultralight::Logger
-    {
-    public:
-        virtual ~ULUEILoggerInterface() = default;
+	/**
+	 * Maps an Unreal Engine FKey to the corresponding Ultralight virtual key code.
+	 *
+	 * @param Key  The Unreal Engine key to map.
+	 * @return     The Ultralight virtual key code, or 0 if no mapping exists.
+	 */
+	int32 MapUEKeyToUltralightKeyCode(const FKey& Key);
 
-        /// @brief Logs a error within the developer defined interface.
-        /// @param log_level The level of the log message.
-        /// @param message What the error message will contain.
-        virtual void LogMessage(ultralight::LogLevel log_level, const ultralight::String &message) = 0;
-    };
+	/**
+	 * Converts Unreal Engine modifier key states to Ultralight modifier flags.
+	 *
+	 * @param bAlt    Whether the Alt key is pressed.
+	 * @param bCtrl   Whether the Ctrl key is pressed.
+	 * @param bShift  Whether the Shift key is pressed.
+	 * @param bCmd    Whether the Command/Meta key is pressed.
+	 * @return        A bitmask of ultralight::KeyEvent::Modifiers values.
+	 */
+	unsigned MapUEModifiers(bool bAlt, bool bCtrl, bool bShift, bool bCmd);
 }

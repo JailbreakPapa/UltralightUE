@@ -21,20 +21,6 @@
  *   SOFTWARE.
  */
 
-#pragma once
+#include "ULUELogging.h"
 
-#include <Ultralight/platform/Logger.h>
-
-namespace ultralightue
-{
-    class ULUEILoggerInterface : public ultralight::Logger
-    {
-    public:
-        virtual ~ULUEILoggerInterface() = default;
-
-        /// @brief Logs a error within the developer defined interface.
-        /// @param log_level The level of the log message.
-        /// @param message What the error message will contain.
-        virtual void LogMessage(ultralight::LogLevel log_level, const ultralight::String &message) = 0;
-    };
-}
+DEFINE_LOG_CATEGORY(LogUltralightUE);

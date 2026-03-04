@@ -20,36 +20,29 @@
  *   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *   SOFTWARE.
  */
-#include "UltralightUE/Public/ULUELogInterface.h"
-#include "Internal/ULUEILoggerInterface.h"
-
-#include "Containers/UnrealString.h"
-#include "Logging/LogMacros.h"
 #include "ULUELogInterface.h"
+#include "ULUELogging.h"
+#include "Internal/ULUEILoggerInterface.h"
 
 ultralightue::ULUELogInterface::ULUELogInterface()
 {
-	if(LoggerInterface == nullptr)
+	if (LoggerInterface == nullptr)
 	{
-		LoggerInterface = new ULUEILoggerInterface();
-	}
-	else
-	{
-		LoggerInterface = nullptr;
+		LoggerInterface = MakeUnique<ULUEILoggerInterface>();
 	}
 }
 
 void ultralightue::ULUELogInterface::LogError(FString details)
 {
-
+	UE_LOG(LogUltralightUE, Error, TEXT("%s"), *details);
 }
 
 void ultralightue::ULUELogInterface::LogWarning(FString details)
 {
-	UE_LOG(LogTemp, Warning, TEXT("UltralightUE Warning: %s"), *details);
+	UE_LOG(LogUltralightUE, Warning, TEXT("%s"), *details);
 }
 
 void ultralightue::ULUELogInterface::LogInfo(FString details)
 {
-	UE_LOG(LogTemp, Log, TEXT("UltralightUE: %s"), *details);
+	UE_LOG(LogUltralightUE, Log, TEXT("%s"), *details);
 }

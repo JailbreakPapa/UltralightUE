@@ -22,10 +22,11 @@
  */
 #pragma once
 #include "ULUEDefines.h"
-#include "Core.h"
+#include "CoreMinimal.h"
+
 namespace ultralightue
 {
-	ULTRALIGHTUE_EXPORT void NotifyUltralightUEStartup()
+	ULTRALIGHTUELIBRARY_EXPORT void NotifyUltralightUEStartup()
 	{
 		UE_LOG(LogTemp, Log, TEXT("Loaded Ultralight Dll(s) from Pre-built binaries."));
 	}

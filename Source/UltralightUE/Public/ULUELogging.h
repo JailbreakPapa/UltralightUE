@@ -24,32 +24,5 @@
 #pragma once
 
 #include "CoreMinimal.h"
-// Assuming ULUEDefines.h is correctly located in UltralightUELibrary's public include path.
-#include "ULUEDefines.h"
 
-// Forward declaration for an Ultralight class, if needed for the GConfig object.
-// namespace ultralight { class Config; }
-
-namespace ultralightue
-{
-	// It seems like this file was intended to hold global information or configurations for the plugin.
-	// A common pattern is to have a static class or a singleton to hold such data.
-	// For example, if Ultralight requires a global Config object to be set up.
-
-	class ULTRALIGHTUE_API FULUEGlobalInformation // Changed ULTRALIGHTUE_EXPORT to ULTRALIGHTUE_API
-	{
-	public:
-		FULUEGlobalInformation();
-		~FULUEGlobalInformation();
-
-		// Example: Static method to get or initialize Ultralight Config
-		// static ultralight::Config& GetUltralightConfig();
-
-		// Add other global settings or utility functions relevant to the plugin.
-
-	private:
-		// Example: Static instance of Ultralight Config
-		// static ultralight::Config UltralightConfigInstance;
-		// static bool bUltralightConfigInitialized;
-	};
-}
+DECLARE_LOG_CATEGORY_EXTERN(LogUltralightUE, Log, All);

@@ -1,0 +1,52 @@
+// UltralightFillPath.usf
+//
+// Simpler vertex + pixel shader for Ultralight's FillPath program
+// (path / compact-format geometry).
+//
+// Vertex layout (20 bytes per vertex):
+//   float2  Position  : ATTRIBUTE0   (offset  0)
+//   float4  Color     : ATTRIBUTE1   (offset  8, packed 4x uint8 RGBA -> normalized)
+//   float2  ObjCoord  : ATTRIBUTE2   (offset 12)
+
+#include "/Engine/Private/Common.ush"
+
+// ---------------------------------------------------------------------------
+// Constant-buffer parameters
+// ---------------------------------------------------------------------------
+float4x4 Transform;       // Combined orthographic projection * model-view matrix
+
+// ---------------------------------------------------------------------------
+// Interpolants
+// ---------------------------------------------------------------------------
+struct FVSOutput
+{
+    float4 Position : SV_POSITION;
+    float4 Color    : COLOR0;
+    float2 ObjCoord : TEXCOORD0;
+};
+
+// ---------------------------------------------------------------------------
+// Vertex Shader
+// ---------------------------------------------------------------------------
+void MainVS(
+    in  float2 InPosition : ATTRIBUTE0,
+    in  float4 InColor    : ATTRIBUTE1,
+    in  float2 InObjCoord : ATTRIBUTE2,
+    out FVSOutput Out
+)
+{
+    Out.Position = mul(float4(InPosition, 0.0, 1.0), Transform);
+    Out.Color    = InColor;
+    Out.ObjCoord = InObjCoord;
+}
+
+// ---------------------------------------------------------------------------
+// Pixel Shader
+// ---------------------------------------------------------------------------
+float4 MainPS(FVSOutput In) : SV_Target0
+{
+    // Output the vertex color directly with premultiplied alpha.
+    float4 OutColor = In.Color;
+    OutColor.rgb *= OutColor.a;
+    return OutColor;
+}

@@ -1,0 +1,141 @@
+// UltralightFill.usf
+//
+// Vertex + Pixel shader for Ultralight's Fill program (quad / full-format geometry).
+//
+// Vertex layout (140 bytes per vertex):
+//   float2  Position  : ATTRIBUTE0   (offset  0)
+//   float4  Color     : ATTRIBUTE1   (offset  8, packed 4x uint8 RGBA -> normalized)
+//   float2  TexCoord  : ATTRIBUTE2   (offset 12)
+//   float2  ObjCoord  : ATTRIBUTE3   (offset 20)
+//   float4  Data0     : ATTRIBUTE4   (offset 28)
+//   float4  Data1     : ATTRIBUTE5   (offset 44)
+//   float4  Data2     : ATTRIBUTE6   (offset 60)
+//   float4  Data3     : ATTRIBUTE7   (offset 76)
+//   float4  Data4     : ATTRIBUTE8   (offset 92)
+//   float4  Data5     : ATTRIBUTE9   (offset108)
+//   float4  Data6     : ATTRIBUTE10  (offset124)
+
+#include "/Engine/Private/Common.ush"
+
+// ---------------------------------------------------------------------------
+// Constant-buffer parameters (bound via UE shader parameter struct)
+// ---------------------------------------------------------------------------
+float4x4 Transform;       // Combined orthographic projection * model-view matrix
+float4   Scalar[8];       // Per-draw scalar uniforms
+float4   Vector[8];       // Per-draw vector uniforms   (e.g. viewport, etc.)
+uint     ClipSize;        // Number of active clip planes / masks (0-8)
+float4x4 Clip[8];         // Clip transform matrices
+
+Texture2D   Texture1;
+SamplerState Texture1Sampler;
+Texture2D   Texture2;
+SamplerState Texture2Sampler;
+
+// ---------------------------------------------------------------------------
+// Interpolants
+// ---------------------------------------------------------------------------
+struct FVSOutput
+{
+    float4 Position  : SV_POSITION;
+    float4 Color     : COLOR0;
+    float2 TexCoord  : TEXCOORD0;
+    float2 ObjCoord  : TEXCOORD1;
+    float4 Data0     : TEXCOORD2;
+    float4 Data1     : TEXCOORD3;
+    float4 Data2     : TEXCOORD4;
+    float4 Data3     : TEXCOORD5;
+    float4 Data4     : TEXCOORD6;
+    float4 Data5     : TEXCOORD7;
+    float4 Data6     : TEXCOORD8;
+};
+
+// ---------------------------------------------------------------------------
+// Vertex Shader
+// ---------------------------------------------------------------------------
+void MainVS(
+    in  float2 InPosition  : ATTRIBUTE0,
+    in  float4 InColor     : ATTRIBUTE1,
+    in  float2 InTexCoord  : ATTRIBUTE2,
+    in  float2 InObjCoord  : ATTRIBUTE3,
+    in  float4 InData0     : ATTRIBUTE4,
+    in  float4 InData1     : ATTRIBUTE5,
+    in  float4 InData2     : ATTRIBUTE6,
+    in  float4 InData3     : ATTRIBUTE7,
+    in  float4 InData4     : ATTRIBUTE8,
+    in  float4 InData5     : ATTRIBUTE9,
+    in  float4 InData6     : ATTRIBUTE10,
+    out FVSOutput Out
+)
+{
+    Out.Position = mul(float4(InPosition, 0.0, 1.0), Transform);
+    Out.Color    = InColor;
+    Out.TexCoord = InTexCoord;
+    Out.ObjCoord = InObjCoord;
+    Out.Data0    = InData0;
+    Out.Data1    = InData1;
+    Out.Data2    = InData2;
+    Out.Data3    = InData3;
+    Out.Data4    = InData4;
+    Out.Data5    = InData5;
+    Out.Data6    = InData6;
+}
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+// Evaluate axis-aligned clip using one of the Clip[] matrices.
+// Returns 0.0 when the fragment should be discarded, 1.0 when fully inside.
+float EvaluateClip(float4x4 ClipMatrix, float2 ObjPos)
+{
+    float2 ClipPos = mul(float4(ObjPos, 0.0, 1.0), ClipMatrix).xy;
+    // Smoothly clip at the [-1, 1] box boundary.
+    float2 Fade = smoothstep(0.0, 1.0, 0.5 + 0.5 * ClipPos);
+    // Combine x and y axes.
+    float Alpha = Fade.x * Fade.y;
+    // Mirror: the clip matrix may flip; handle negative half-space.
+    float2 FadeNeg = smoothstep(0.0, 1.0, 0.5 - 0.5 * ClipPos);
+    Alpha *= FadeNeg.x * FadeNeg.y;
+    return Alpha;
+}
+
+// ---------------------------------------------------------------------------
+// Pixel Shader
+// ---------------------------------------------------------------------------
+float4 MainPS(FVSOutput In) : SV_Target0
+{
+    // --- Per-pixel clipping ---
+    float ClipAlpha = 1.0;
+
+    // Unroll manually up to 8 clip entries (ClipSize is runtime-uniform).
+    [unroll]
+    for (uint i = 0; i < 8; ++i)
+    {
+        if (i < ClipSize)
+        {
+            ClipAlpha *= EvaluateClip(Clip[i], In.ObjCoord);
+        }
+    }
+
+    if (ClipAlpha < 0.001)
+    {
+        discard;
+    }
+
+    // --- Texture sampling ---
+    // Scalar[0].x encodes whether texturing is enabled (1.0 = yes).
+    float4 TexColor = float4(1.0, 1.0, 1.0, 1.0);
+    if (Scalar[0].x > 0.5)
+    {
+        TexColor = Texture2DSample(Texture1, Texture1Sampler, In.TexCoord);
+    }
+
+    // --- Combine vertex color, texture, and clip ---
+    float4 OutColor = In.Color * TexColor;
+    OutColor.a *= ClipAlpha;
+
+    // Premultiplied alpha output.
+    OutColor.rgb *= OutColor.a;
+
+    return OutColor;
+}

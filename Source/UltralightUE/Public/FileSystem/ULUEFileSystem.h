@@ -76,13 +76,8 @@ namespace ultralightue
 
         virtual bool GetFileCharset(const ultralight::String &path, ultralight::String &result) override;
 
-        // These are optional according to Ultralight docs, but kept for completeness if implemented.
-        // virtual bool GetFileCreationTime(const ultralight::String &path, int64_t &result) override;
-        // virtual bool GetFileLastModificationTime(const ultralight::String &path, int64_t &result) override;
-
-        // Removed GetFileCreationTime and GetFileLastModificationTime as they were commented out in the .cpp
-        // and are optional in the Ultralight FileSystem interface. If they were intended to be implemented,
-        // they should be uncommented here and in the .cpp file.
+        virtual bool GetFileCreationTime(const ultralight::String &path, int64_t &result) override;
+        virtual bool GetFileLastModificationTime(const ultralight::String &path, int64_t &result) override;
 
     private:
         FString MapPath(const ultralight::String &path);

@@ -21,20 +21,35 @@
  *   SOFTWARE.
  */
 
-#pragma once
+#include "Platform/ULUEClipboard.h"
+#include "ULUELogging.h"
 
-#include <Ultralight/platform/Logger.h>
+#include "HAL/PlatformApplicationMisc.h"
 
 namespace ultralightue
 {
-    class ULUEILoggerInterface : public ultralight::Logger
-    {
-    public:
-        virtual ~ULUEILoggerInterface() = default;
 
-        /// @brief Logs a error within the developer defined interface.
-        /// @param log_level The level of the log message.
-        /// @param message What the error message will contain.
-        virtual void LogMessage(ultralight::LogLevel log_level, const ultralight::String &message) = 0;
-    };
+void ULUEClipboard::Clear()
+{
+	// Write an empty string to effectively clear the clipboard
+	FPlatformApplicationMisc::ClipboardCopy(TEXT(""));
+	UE_LOG(LogUltralightUE, Verbose, TEXT("Clipboard: Cleared."));
 }
+
+ultralight::String ULUEClipboard::ReadPlainText()
+{
+	FString ClipboardText;
+	FPlatformApplicationMisc::ClipboardPaste(ClipboardText);
+
+	FTCHARToUTF8 Converter(*ClipboardText);
+	return ultralight::String(Converter.Get(), Converter.Length());
+}
+
+void ULUEClipboard::WritePlainText(const ultralight::String& text)
+{
+	FString TextStr = FString(UTF8_TO_TCHAR(text.utf8().data()));
+	FPlatformApplicationMisc::ClipboardCopy(*TextStr);
+	UE_LOG(LogUltralightUE, Verbose, TEXT("Clipboard: Wrote %d characters."), TextStr.Len());
+}
+
+} // namespace ultralightue

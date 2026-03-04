@@ -8,9 +8,9 @@
 
 namespace ultralightue
 {
-    void ULUEFileSystem::SetFSAccess(ultralightue::FSAccess &in_accesspattern)
+    void ULUEFileSystem::SetFSAccess(FSAccess InAccessPattern)
     {
-        m_access = in_accesspattern;
+        m_access = InAccessPattern;
     }
 
     ULUEFileSystem::ULUEFileSystem()
